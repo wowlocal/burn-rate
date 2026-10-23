@@ -5,8 +5,9 @@ import RandoriCore
 /// no AI special moves, the interface names our content uses, and the library
 /// value the application's sessions require (OriginalLibData.Required).
 public enum BurnRateRules {
-    /// Fighters are IDs 1...9 (art/characters.json); items 100..<200.
-    public static let fighterIDs: Range<Int32> = 1..<10
+    /// Fighters are IDs 1...10 (art/characters.json; the Demo and Random need
+    /// nine eligible beyond catalog ordinal 0); items 100..<200.
+    public static let fighterIDs: Range<Int32> = 1..<11
     public static let itemRange: Range<Int32> = 100..<200
 
     /// The interface's names, one per engine slot (the engine fixes only the

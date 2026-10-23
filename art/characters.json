@@ -124,5 +124,19 @@
       "power": 1.15,
       "jump": -14.5
     }
+  },
+  "viral": {
+    "id": 10,
+    "name": "Viral",
+    "description": "'Viral', a flashy growth-hacker marketer: spiky teal hair, a bright yellow bomber jacket covered in social-media style badges, a white t-shirt, slim black jeans, red sneakers, holding a small megaphone, an over-excited grin.",
+    "special_windup": "raising the megaphone to the mouth and taking a deep breath",
+    "special_release": "shouting into the megaphone, glowing sound-wave rings blasting forward",
+    "height": 64,
+    "stats": {
+      "walk": 4.4,
+      "run": 9.2,
+      "power": 0.95,
+      "jump": -16.0
+    }
   }
 }

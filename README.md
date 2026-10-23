@@ -19,6 +19,7 @@ here; all sounds and music are synthesized. Nothing comes from another game.
 | Prompt | prompt-engineer streamer | a chat bubble (fast) |
 | Intern | tireless intern | an energy-drink can (fastest, light) |
 | Angel | angel investor | a golf ball |
+| Viral | growth hacker | a megaphone sound wave |
 
 Every founder also has D ^ A, a launching uppercut. Specials cost Hype (MP).
 

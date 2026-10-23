@@ -183,7 +183,8 @@ def character_text(c, stem):
 # golf ball 22-23.
 PROJECTILE_BASE, PROJECTILE_CELL = 200, 39
 PROJECTILE_PICS = {"blitz": [0, 1, 2], "vector": [3, 4, 5], "vesta": [6, 7, 8], "moonshot": [9, 10, 11], "ada": [12, 13, 14],
-                   "gigawatt": [15, 16, 17], "prompt": [18, 19], "intern": [20, 21], "angel": [22, 23]}
+                   "gigawatt": [15, 16, 17], "prompt": [18, 19], "intern": [20, 21], "angel": [22, 23],
+                   "viral": [24, 25, 26]}   # 24-26: props2.png (sound-wave rings)
 def projectile_text(name, stem, pictures):
     cell = PROJECTILE_CELL
     t = (f"\n<bmp_begin>\nname: {name}\nfile(0-3): sprite\\br\\{stem}_p.bmp  w: {cell}  h: {cell}  row: 4  col: 1\n<bmp_end>\n\n")
@@ -301,14 +302,19 @@ def main():
     objects += "id: 100 type: 1 file: data\\br_coffee.dat\r\n"
     props = RAW / "misc" / "props.png"
     if props.exists():
-        a, fg, boxes = process.find_poses(Image.open(props), 24, min_cells=20)
+        sprites = []   # (image array, foreground, box) per projectile picture, props.png then props2.png
+        for src, count in ((props, 24), (RAW / "misc" / "props2.png", 3)):
+            if src.exists():
+                a, fg, boxes = process.find_poses(Image.open(src), count, min_cells=20)
+                sprites += [(a, fg, b) for b in boxes]
         for stem, c in CHARACTERS.items():
-            pics = PROJECTILE_PICS[stem]; cell = PROJECTILE_CELL
-            sizes = [max(boxes[i][2] - boxes[i][0], boxes[i][3] - boxes[i][1]) for i in pics]
+            pics = [i for i in PROJECTILE_PICS[stem] if i < len(sprites)] or PROJECTILE_PICS["blitz"]; cell = PROJECTILE_CELL
+            sizes = [max(sprites[i][2][2] - sprites[i][2][0], sprites[i][2][3] - sprites[i][2][1]) for i in pics]
             scale = (cell - 7) / max(sizes)
             sheet = np.zeros((cell, 4 * (cell + 1), 3), np.uint8)
             for k, i in enumerate(pics):
-                rgb, keep = process.render(a, fg, boxes[i], scale)
+                a, fg, box = sprites[i]
+                rgb, keep = process.render(a, fg, box, scale)
                 h, w = keep.shape; ox = k * (cell + 1) + (cell - w) // 2; oy = (cell - h) // 2
                 region = sheet[oy:oy + h, ox:ox + w]; region[keep] = rgb[keep]
             dat = f"data\\br_{stem}_p.dat"; pid = PROJECTILE_BASE + c["id"] - 1

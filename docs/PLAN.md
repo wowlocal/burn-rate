@@ -129,7 +129,7 @@ startup founders fight. ассеты будешь генерировать пр�
   peak ≤ 0.98), the AppKit app starts with the packaged tracks.
 
 - 2026-10-23 G6 (branding): Randori 786befd (E10, game-supplied branding:
-  reviewed, CI pending, NTSD's gate pending in ntsd-2.4) at Vendor/randori;
+  reviewed, CI green, NTSD's gate es-e10 passed in ntsd-2.4, bd736aec) at Vendor/randori;
   BurnRateRules.branding: window "Burn Rate" (class BurnRate), quit caption
   "Burn Rate", credit lines "by BurnRateHQ, Randori Team" / "2026, an
   experimental brawler." / "github.com/wowlocal/randori " (the engine's
@@ -137,8 +137,30 @@ startup founders fight. ассеты будешь генерировать пр�
   the Randori repository, the built-in road named "Highway 101". Checked:
   the AppKit title screen shows the game's lines; the smoke check passes.
 
+- 2026-10-23 G6 (playtest, first pass): tools/playtest.py. VS against the
+  computer with each of the nine founders (both specials, punches; about
+  870 bodies each): no boundary. Every other mode stopped in the Demo's
+  match preparation ("Empty random roster requires original stack scratch
+  provenance", OriginalMatchContinuation.swift:103): each of the eight
+  seats draws from the eligible founders minus every seat's current value,
+  stale ones included, so with eight eligible (ordinal 0 never is) a seat
+  can find none; the original would read unwritten stack there. Fix: a
+  tenth founder (nine eligible guarantee a candidate). Also: the arrow keys
+  drive the menu-gamepad cursor, not the mode list, so the playtest picks
+  modes by clicking their rows.
+
+- 2026-10-23 G6 (tenth founder): Viral, a growth hacker with a megaphone
+  (Codex: sheets A, B, C, portrait; a sound-wave projectile sheet,
+  props2.png), ID 10; Random candidates 1..<11. Playtest: VS with each of
+  the ten founders and the Demo (eight computer founders, 1369 bodies) run
+  without a boundary; the mode list is driven with --original-menu-input
+  (the arrow keys then reach the game). Stage Mode stops at "Selected
+  arena" (no stage-to-background map, a placeholder stage.dat) and Battle
+  Mode at the War setup's domain check (record word 0x44d37c = 11 and the
+  troop tables); Championship and 2 on 2 run but the script never starts
+  a match. Surveying both modes' needs.
+
 ## Next task
 
-G6: a full playtest pass in the AppKit app (every founder's specials, the
-four stages and the road, the result screen), balance, and E10's NTSD gate
-in ntsd-2.4 before calling the engine revision settled.
+G6: Stage Mode and Battle Mode content (stages, stage-to-background map,
+War troops and record words) after the survey; Championship input flow.

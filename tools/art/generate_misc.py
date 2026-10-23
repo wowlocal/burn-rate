@@ -30,6 +30,10 @@ JOBS = {
         "a big gold coin spinning (3 frames). Row 3: a glowing green hexagon shield (3 frames), a glowing green GPU card spinning "
         "(3 frames). Row 4: a pink glowing chat bubble (2 frames), a crushed energy drink can (2 frames), a white golf ball with a "
         "motion streak (2 frames)."),
+    "props2": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients, no shadows, no floor. A sprite sheet "
+        f"of small game projectile sprites {STYLE}, 3 sprites in one row with generous magenta space between them, each centred, "
+        "all at the same small scale: 3 animation frames of glowing teal and yellow sound-wave rings (curved arcs) blasting to the "
+        "right, growing slightly from frame to frame."),
     "sparks": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients. A sprite sheet of fighting game hit "
         f"effects {STYLE}, 4 columns x 2 rows grid with generous magenta space: row 1 a white and yellow impact star burst growing "
         "over 4 frames; row 2 a blue guard-block spark over 4 frames."),
