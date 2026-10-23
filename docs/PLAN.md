@@ -186,6 +186,10 @@ startup founders fight. ассеты будешь генерировать пр�
   wowlocal/burn-rate (public); a recursive clone from GitHub has the tested tree
   (f4f2c70). No license file yet (the user's choice).
 
+- 2026-10-23 license: MIT (the user's answer, "MIT", relayed by the
+  ntsd-2-4-02 session), holder "the Burn Rate authors" after Randori's
+  NOTICE ("the Randori authors"); README names it and the engine's Apache-2.0.
+
 ## Next task
 
 Optional polish, for the user to steer: more stage sets (2-1 onward) and

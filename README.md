@@ -64,3 +64,10 @@ See [docs/PLAN.md](docs/PLAN.md) for the plan and its ledger,
 [docs/ENGINE_CONTRACT.md](docs/ENGINE_CONTRACT.md) for what a game gives the
 engine and [docs/INTERFACE_SLOTS.md](docs/INTERFACE_SLOTS.md) for the
 interface's slots.
+
+## License
+
+MIT, see [LICENSE](LICENSE): the code, the art in `art/`, the sounds and the
+music. The engine, [Randori](https://github.com/wowlocal/randori), is a
+separate project under the Apache License 2.0 (`Vendor/randori/LICENSE` and
+`NOTICE`).
