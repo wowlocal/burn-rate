@@ -51,9 +51,9 @@ startup founders fight. ассеты будешь генерировать пр�
 | ID | Step | Status |
 | --- | --- | --- |
 | G0 | Scaffold: Randori submodule, package (content, app, headless), the content builder writing the eight packages and the identity from authored sources, placeholder art; a headless start to the title and a scripted VS match against the computer to a knock-out | **done** (2026-10-23) |
-| G1 | Character pipeline: prompts, Codex sheets, slicer (despill, key, scale, anchor), sheets/mirrors/portraits; Blitz in the game with the full frame set | |
-| G2 | The roster to nine fighters, each with stats and one special (projectile objects) | |
-| G3 | Stages (backgrounds, layers, shadow) and items | |
+| G1 | Character pipeline: prompts, Codex sheets, slicer (despill, key, scale, anchor), sheets/mirrors/portraits; Blitz in the game with the full frame set | **done** (2026-10-23, all nine) |
+| G2 | The roster to nine fighters, each with stats and one special (projectile objects) | **done** (2026-10-23: D>A projectile, D^A uppercut; balance open) |
+| G3 | Stages (backgrounds, layers, shadow) and items | **done** (2026-10-23: four stages, the coffee item; the built-in road waits for E10's name) |
 | G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | |
 | G5 | Sound effects and music | |
 | G6 | macOS app (.app on NTSD-Builds), window title, playtest | |
@@ -82,6 +82,23 @@ startup founders fight. ассеты будешь генерировать пр�
   start with text drawn. Found: the title screen shows LF2's credit lines
   (engine literals) and the window is titled "Little Fighter 2" — an engine
   change (game-supplied branding) is needed before anything is shown.
+
+- 2026-10-23 G1-G3: Codex drew all nine fighters (sheets A, B, C and a
+  portrait each, sheet A as the reference for the rest: 36 images, about
+  100 s each) and seven misc images (four stages, projectiles/effects, hit
+  sparks, the title). process.py: adaptive grouping (the pose count must
+  match), an edge-only despill (purple clothes keep their colour), 109x109
+  cells with the feet at (49,104) so raised fists and thrown props fit, a
+  height per fighter (Intern 58 ... Gigawatt 76), the HUD picture cropped to
+  the face. stage.py: boxes relative to the feet; specials on every
+  fighter (D>A: frame 240-242, 150 MP, an opoint spawning the fighter's
+  projectile 200+id at frame 100; D^A: frame 250-252, 60 MP, a launching
+  uppercut); projectiles (type 3) fly frames 100-139 at dvx 12 and vanish
+  (next 1000), with 10/20/30 for the engine's hit transitions; four stages
+  (backdrop scaled to 550 px with parallax, a mirrored seamless floor band
+  1600 wide, z 322-512). Checks: headless VS runs show the windup, the
+  thrown slides crossing the stage and the fighters' fight; the start-of-
+  match blink (75 ticks, the engine's spawn invulnerability) explained.
 
 ## Next task
 

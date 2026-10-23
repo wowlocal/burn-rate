@@ -16,10 +16,10 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-CELL = 79            # the DAT's w/h; the sheet pitch is CELL+1
+CELL = 109           # the DAT's w/h; the sheet pitch is CELL+1 (room for raised fists and thrown props)
 COLUMNS, ROWS = 10, 4  # 40 pictures per sheet
-CENTER_X, BASELINE = 39, 77
-HEIGHT = 66          # idle pose height in game pixels
+CENTER_X, BASELINE = 49, 104
+HEIGHT = 66          # default idle pose height in game pixels (characters.json "height" overrides)
 POSES = {"A": 12, "B": 12, "C": 8}
 
 def magenta(a):
@@ -33,7 +33,7 @@ def dilate(mask, pad):
             out |= np.roll(np.roll(mask, dy, 0), dx, 1)
     return out
 
-def find_poses(img, expected):
+def find_poses(img, expected, min_cells=150):
     a = np.asarray(img.convert("RGB")).astype(float); bg = magenta(a); fg = ~bg
     # The magenta fringe: only pixels next to the background are despilled,
     # so a character's own purples keep their colour.
@@ -42,7 +42,7 @@ def find_poses(img, expected):
     # Group on a coarse grid (4 px), dilated so a pose's detached parts join;
     # the dilation shrinks until the expected number of poses separate.
     for pad in (3, 2, 1, 0, 4, 5):
-        boxes = group(fg, pad)
+        boxes = group(fg, pad, min_cells)
         if len(boxes) == expected: break
     tight = []
     for x0, y0, x1, y1 in boxes:
@@ -52,7 +52,7 @@ def find_poses(img, expected):
         raise SystemExit(f"found {len(tight)} poses, expected {expected}: {tight}")
     return a, fg, order(tight)
 
-def group(fg, pad):
+def group(fg, pad, min_cells=150):
     s = 4; h, w = fg.shape; gh, gw = h // s, w // s
     grid = fg[:gh * s, :gw * s].reshape(gh, s, gw, s).any(axis=(1, 3))
     dil = np.zeros_like(grid)
@@ -70,7 +70,7 @@ def group(fg, pad):
                     for ny, nx in ((cy + 1, cx), (cy - 1, cx), (cy, cx + 1), (cy, cx - 1)):
                         if 0 <= ny < gh and 0 <= nx < gw and dil[ny, nx] and not seen[ny, nx]:
                             seen[ny, nx] = True; q.append((ny, nx))
-                if n > 150:
+                if n > min_cells:
                     boxes.append([x0 * s, y0 * s, min(w, (x1 + 1) * s), min(h, (y1 + 1) * s)])
     return boxes
 
@@ -147,6 +147,7 @@ def save_bmp(array, path):
 def main():
     p = argparse.ArgumentParser(); p.add_argument("raw"); p.add_argument("stem"); p.add_argument("out")
     p.add_argument("--tint", type=float, default=None); p.add_argument("--source-stem", default=None)
+    p.add_argument("--height", type=float, default=HEIGHT)
     o = p.parse_args()
     src = o.source_stem or o.stem
     raw = Path(o.raw) / src; out = Path(o.out)
@@ -156,7 +157,7 @@ def main():
         if f.exists(): sheets[kind] = find_poses(Image.open(f), count)
     if "A" not in sheets: raise SystemExit(f"{raw}: no sheet A")
     a, fg, boxes = sheets["A"]
-    scale = HEIGHT / (boxes[0][3] - boxes[0][1])
+    scale = o.height / (boxes[0][3] - boxes[0][1])
     sheet = np.zeros((ROWS * (CELL + 1), COLUMNS * (CELL + 1), 3), np.uint8)
     report = {"scale": scale, "pictures": {}}
     index = 0
@@ -188,7 +189,10 @@ def main():
         canvas = Image.new("RGB", (w, h), (40, 44, 70)); canvas.paste(img, ((w - img.width) // 2, h - img.height))
         arr = np.asarray(canvas).copy(); arr[arr.sum(axis=-1) == 0] = (8, 8, 16); return arr
     save_bmp(fit(face, 120, 120), out / f"{o.stem}_f.bmp")
-    save_bmp(fit(face, 40, 45), out / f"{o.stem}_s.bmp")
+    # The HUD picture: the face (the portrait's upper middle), not the bust.
+    fh, fw = face.shape[:2]; cw = int(min(fw, fh) * 0.62); ch = min(fh, cw * 45 // 40)
+    x0 = (fw - cw) // 2; y0 = int(fh * 0.04)
+    save_bmp(fit(face[y0:y0 + ch, x0:x0 + cw], 40, 45), out / f"{o.stem}_s.bmp")
     (out / f"{o.stem}.json").write_text(json.dumps(report, indent=1))
     print(f"{o.stem}: {index} pictures, scale {scale:.3f}")
 
