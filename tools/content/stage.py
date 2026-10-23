@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "tools" / "art"))
+sys.path.insert(0, str(ROOT / "tools" / "art")); sys.path.insert(0, str(ROOT / "tools" / "content"))
 import process  # noqa: E402
 
 RAW = Path(os.environ.get("BURNRATE_RAW", "/Volumes/NTSD-Builds/tasks/burnrate/art/raw"))
@@ -22,11 +22,9 @@ CHARACTERS = json.loads((ROOT / "art" / "characters.json").read_text())
 
 # --- names shared with Sources/BurnRateRules/BurnRateRules.swift ---------------
 def two(n): return f"{n:02d}"
-FRONT = [f"BR_FRONT_{two(i)}" for i in range(24)]
-IFACE = [f"BR_IFACE_{two(i)}" for i in range(10)]
+import interface  # noqa: E402  (tools/content)
+FRONT, IFACE, MENU, WAR = interface.FRONT, interface.IFACE, interface.MENU, interface.WAR
 COMMON = [f"data\\br_common_{two(i)}.wav" for i in range(18)]
-MENU = [f"BR_MENU_{two(i)}" for i in range(11)]
-WAR = ["BR_WAR_00", "BR_WAR_01"]
 MENU_SOUNDS = [f"data\\br_menu_{i}.wav" for i in range(5)]
 MUSIC = [f"bgm\\{n}.wma" for n in ("main", "stage1", "stage2", "stage3", "stage4", "stage5", "boss1", "boss2")]
 SCREEN = (794, 550)
@@ -259,12 +257,11 @@ def main():
     rec = bytearray(RECORD_SIZE)
     for addr, value in RECORD_WORDS.items(): rec[addr - RECORD_BASE:addr - RECORD_BASE + 4] = struct.pack("<I", value)
     st.doc["startup"].append({"path": "initial.bin", "source": st.file("startup/initial.bin", bytes(rec))})
+    ui = interface.build(RAW / "misc", ROOT / "Sources" / "BurnRateRules" / "GeneratedInterface.swift")
     for n in range(1, 14):
-        st.doc["startup"].append({"path": f"bitmaps/MENU_BACK{n}.dib", "source": st.file(f"startup/MENU_BACK{n}.dib",
-            dib_bytes(panel(*SCREEN, (20 + 6 * n, 24, 60 + 8 * n), label=f"BURN RATE {n}")))})
-    for i, name in enumerate(FRONT):
-        st.doc["startup"].append({"path": f"bitmaps/{name}.dib", "source": st.file(f"startup/{name}.dib",
-            dib_bytes(panel(256, 260 if 18 <= i <= 23 else 64, (40, 40 + 8 * i, 90), label=name)))})
+        st.doc["startup"].append({"path": f"bitmaps/MENU_BACK{n}.dib", "source": st.file(f"startup/MENU_BACK{n}.dib", dib_bytes(ui[f"MENU_BACK{n}"]))})
+    for name in dict.fromkeys(FRONT):   # distinct names; the cursor is listed twice
+        st.doc["startup"].append({"path": f"bitmaps/{name}.dib", "source": st.file(f"startup/{name}.dib", dib_bytes(ui[name]))})
     st.doc["startup"].append({"path": "data/control.txt", "source": st.file("startup/control.txt", control_text())})
     st.doc["startup"].append({"path": "data/adinfo.txt", "source": st.file("startup/adinfo.txt", "dont_update 0 5 <end>\r\n")})
     for i, name in enumerate(MENU_SOUNDS):
@@ -333,8 +330,9 @@ def main():
             st.file(rel, bmp_bytes(arr)); st.doc["arenas"].append({"name": path, "source": rel})
         st.doc["catalog"].append({"name": shadow_path, "kind": "bitmapFile", "source": "arena/" + shadow_path.replace("\\", "/")})
     # Built-ins the registry requests before the catalog.
+    road = interface.road(RAW / "misc")
     for i, name in enumerate(["shadow1", "back99_1", "back99_2", "back99_3"]):
-        st.catalog(name, "dib", f"catalog/{name}.dib", dib_bytes(shadow if i == 0 else panel(64, 32, (60, 80 + 30 * i, 60))))
+        st.catalog(name, "dib", f"catalog/{name}.dib", dib_bytes(shadow if i == 0 else road[i - 1]))
     for name in MUSIC:
         st.catalog(name, "music", f"catalog/{name.split(chr(92))[1]}.txt", f"Burn Rate placeholder for {name}; never read\n")
 
@@ -342,9 +340,9 @@ def main():
     for i, name in enumerate(COMMON):
         st.doc["commonSounds"].append({"name": name, "source": st.file(f"common/{i}.wav",
             wav_bytes(tone(0.1 + 0.01 * i, 200 + 40 * i, 80 + 20 * i, noise=0.5, volume=0.5, seed=i)))})
-    for key, names, size in (("interfaceBitmaps", IFACE, (160, 60)), ("menuBitmaps", MENU, (200, 120)), ("warBitmaps", WAR, (200, 120))):
-        for i, name in enumerate(names):
-            st.doc[key].append({"name": name, "source": st.file(f"{key}/{name}.dib", dib_bytes(panel(*size, (90, 30 + 15 * i, 60), label=name)))})
+    for key, names in (("interfaceBitmaps", IFACE), ("menuBitmaps", MENU), ("warBitmaps", WAR)):
+        for name in names:
+            st.doc[key].append({"name": name, "source": st.file(f"{key}/{name}.dib", dib_bytes(ui[name]))})
 
     # Music: short quiet tracks until G5 (AVAudioPlayer plays WAV).
     for i, name in enumerate(MUSIC):

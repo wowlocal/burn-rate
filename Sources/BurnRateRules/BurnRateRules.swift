@@ -13,11 +13,9 @@ public enum BurnRateRules {
     /// list lengths: 24 front, 10 interface, 18 common sounds, 11 menu,
     /// 2 War, 5 menu sounds). Common and menu sounds carry the five-character
     /// `data\` prefix the loaders expect.
-    public static let frontBitmaps = (0..<24).map { "BR_FRONT_\(two($0))" }
-    public static let interfaceBitmaps = (0..<10).map { "BR_IFACE_\(two($0))" }
+    /// The pictures' names, the front sheets' rectangles and the War mode
+    /// frames come from tools/content/interface.py (GeneratedInterface.swift).
     public static let commonSounds = (0..<18).map { "data\\br_common_\(two($0)).wav" }
-    public static let menuBitmaps = (0..<11).map { "BR_MENU_\(two($0))" }
-    public static let warBitmaps = ["BR_WAR_00", "BR_WAR_01"]
     public static let menuSounds = (0..<5).map { "data\\br_menu_\($0).wav" }
     static func two(_ value: Int) -> String { value < 10 ? "0\(value)" : "\(value)" }
 
@@ -48,8 +46,8 @@ public enum BurnRateRules {
         weaponBreak: .init(fragments: [:], fragmentObject: -1, highToss: OriginalIDSet([]), lowToss: OriginalIDSet([]),
                            frames0: -1, frames10: -1, frames150: -1, frames20: -1, frames40: -1, frames54: -1, frame170: -1,
                            frame60: -1, frames70: -1, frames160: -1, frame174: OriginalIDSet([])),
-        interface: .init(frontBitmaps: frontBitmaps, frontSheets: [], interfaceBitmaps: interfaceBitmaps, commonSounds: commonSounds,
-                         menuBitmaps: menuBitmaps, warBitmaps: warBitmaps, menuSounds: menuSounds, panelFrames: [], warModeFrames: []),
+        interface: .init(frontBitmaps: frontBitmaps, frontSheets: frontSheets, interfaceBitmaps: interfaceBitmaps, commonSounds: commonSounds,
+                         menuBitmaps: menuBitmaps, warBitmaps: warBitmaps, menuSounds: menuSounds, panelFrames: [], warModeFrames: warModeFrames),
         characterAI: .init(stageAllyBound: -1, healBall: -1, healers: OriginalIDSet([]), stateDanger: -1, frameDanger: -1,
                            pickupItems: OriginalIDRange(0..<0), pickupExtra: -1, soughtDrink: -1, avoidedDrink: -1, idleDefenders: [],
                            drinks: OriginalIDSet([]), rangedBand: OriginalIDSet([]), rangedJoiner: -1, meleeWeapons: OriginalIDSet([]),

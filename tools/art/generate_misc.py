@@ -33,6 +33,16 @@ JOBS = {
     "sparks": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients. A sprite sheet of fighting game hit "
         f"effects {STYLE}, 4 columns x 2 rows grid with generous magenta space: row 1 a white and yellow impact star burst growing "
         "over 4 frames; row 2 a blue guard-block spark over 4 frames."),
+    "logo": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients, no shadows. A wide video game title "
+        "logo that reads exactly BURN RATE in big bold chunky pixel-art capital letters, the letters filled with an orange-to-yellow "
+        "fire gradient, a dark navy outline, small pixel flames licking off the top of the letters, a tiny burning dollar sign "
+        "replacing nothing (keep the letters readable). The logo is about six times wider than tall, centred."),
+    "random_face": ("Use one flat solid magenta (#FF00FF) background everywhere. A square character-select portrait for a "
+        f"'random fighter' slot {STYLE}: a dark navy silhouette of a startup founder head and shoulders in a hoodie with a big glowing "
+        "orange question mark over the face, filling the square."),
+    "icons": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients. Five video game input device icons "
+        f"{STYLE}, in one row with generous magenta space between them, each about the same size: 1 a computer keyboard, "
+        "2 a game controller (blue), 3 a game controller (red), 4 a game controller (green), 5 a game controller (yellow)."),
     "title": (f"A title screen background illustration for a 2D fighting game {STYLE}: a dramatic Silicon Valley skyline at "
         "night with glowing data-center lights, a giant burning dollar-bill shaped flame in the sky, neon purple and orange "
         "colours, lots of empty dark space in the middle and bottom for menu buttons. Landscape."),

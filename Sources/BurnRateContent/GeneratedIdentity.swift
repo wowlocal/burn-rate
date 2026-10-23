@@ -4,9 +4,9 @@ import BurnRateRules
 
 enum GeneratedIdentity {
     static let identity = OriginalContentIdentity(exeSHA256: "e7c830280fe5e4f74d051ddec1e78ffc2f4ef3c09e493eb42e67152750d560f2",
-        catalog: .init(manifestSHA256: "ccc55105167aeec262264275e7954ff05ec7d27a42cfbbb762bbdd70739b6722", entries: 98, files: 26, bitmaps: 64, music: 8),
-        startup: .init(manifestSHA256: "e92abeb0bb973f2fed23d83660cd04568cf0dfa357e60879fc9dafd0669ed3e6", entries: 46, absentFiles: ["data/ad0.txt"]),
-        loadingManifestSHA256: "e3c2b5761d1b9ee7cb1f8a72621f5ebfa44848369147ed0d1eb5e1dab4ebbc75", interfaceManifestSHA256: "1d0161eeaf0301418edf36bc0ba2bc97aedb99115d4113225518d1e8ff345587",
-        menuManifestSHA256: "ce1d623c370d59449f2b79d096d76a66e2aa90037afa88e1401458fca310aeae", warMenuManifestSHA256: "7f99b8a5175c82edb9d5b04a3c8ae8a68bd1bdc646ce924286b387fee003d621",
+        catalog: .init(manifestSHA256: "ce8dd1b06e66917a71353618d7988c3e9c4f0110528897e1b14bb9af537e3633", entries: 98, files: 26, bitmaps: 64, music: 8),
+        startup: .init(manifestSHA256: "e81ee0727d272f0fbd3e2b1b935949549f506f26e39c23ec2977d6b4b5a8bb53", entries: 45, absentFiles: ["data/ad0.txt"]),
+        loadingManifestSHA256: "e3c2b5761d1b9ee7cb1f8a72621f5ebfa44848369147ed0d1eb5e1dab4ebbc75", interfaceManifestSHA256: "5bd525e87ee06138ebfd79c583bdbdf9c64cbf06855ffdfecbcd0e6ac3dbb308",
+        menuManifestSHA256: "0bd3ce817d4ff0ad4944758b1e8ef10cc52e0ad77f33f075b90f5aa1feb1f327", warMenuManifestSHA256: "d2a8ccc8cc5ddcd739e78d080aca698b48d81ecdb37a924566fe7f6a6ffbcf0a",
         arenaManifestSHA256: "bbb92a15e7b7ea6acd527a15fcf6f3c4203e44a29d8427110185d85252118768", rules: BurnRateRules.rules)
 }

@@ -54,7 +54,7 @@ startup founders fight. ассеты будешь генерировать пр�
 | G1 | Character pipeline: prompts, Codex sheets, slicer (despill, key, scale, anchor), sheets/mirrors/portraits; Blitz in the game with the full frame set | **done** (2026-10-23, all nine) |
 | G2 | The roster to nine fighters, each with stats and one special (projectile objects) | **done** (2026-10-23: D>A projectile, D^A uppercut; balance open) |
 | G3 | Stages (backgrounds, layers, shadow) and items | **done** (2026-10-23: four stages, the coffee item; the built-in road waits for E10's name) |
-| G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | |
+| G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | **done** (2026-10-23; LF2's credit lines wait for E10) |
 | G5 | Sound effects and music | |
 | G6 | macOS app (.app on NTSD-Builds), window title, playtest | |
 
@@ -100,8 +100,25 @@ startup founders fight. ассеты будешь генерировать пр�
   thrown slides crossing the stage and the fighters' fight; the start-of-
   match blink (75 ticks, the engine's spawn invulnerability) explained.
 
+- 2026-10-23 G4: tools/content/interface.py draws every interface slot
+  (docs/INTERFACE_SLOTS.md, from a read-only survey of the engine): nine
+  front-sheet atlases packed in frame order with the engine's frame sizes
+  (title menu, mode list, settings box and their highlights at the engine's
+  fixed positions; network, controls, replays, tournament, Stage, War and
+  opt-in screens as plain labelled panels), the cursor, 13 menu
+  backgrounds (Codex title art and darkened stages, a QUIT corner), the
+  loading screen, device icons (Codex), the HUD cell (RUNWAY/HYPE bars),
+  BARS, six team-coloured 8x16 fonts (Menlo), result boards, the character
+  screen (eight portrait windows), countdown digits, join prompts, the
+  Random face (Codex), hit sparks (Codex art in the engine's fixed bands)
+  and the engine's built-in road (the burning bill, the skyline, lane
+  dashes). It writes GeneratedInterface.swift (names, sheet rectangles,
+  War frames) for the rules. Checked in the AppKit app: title, mode list,
+  character screen with a computer on Random, settings, a match on the
+  road with the HUD.
+
 ## Next task
 
-E10 in the engine (ntsd-2.4 exp/engine-split): the window title/class, the
-title screen's credit lines and links, and the other "LF2" captions become
-game values with LF2's as the default (NTSD unchanged); then G1.
+E10 in the engine (implemented, in review): then bump Vendor/randori and set
+Burn Rate's branding (window title, credit lines, links, "Highway 101");
+G5 sounds and music.
