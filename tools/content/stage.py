@@ -42,7 +42,24 @@ RECORD_WORDS = {
     0x44d07c: 1,          # loaded menu bitmaps load while nonzero
     0x44dce8: 0x44a2b4,   # the replay writer's version pointer (exact)
     0x44d03c: 0x100,      # the game's version word
+    # Battle Mode (War): eleven unit cells (founders 1-9, the coffee twice: cells
+    # 9-10 are drawn as item icons), the preset display words, both sides'
+    # defence (100 = x1.0), the setup's x offset and the War bitmaps' load flag.
+    0x44d37c: 11, 0x44d380: 1, 0x44d384: 1, 0x44d758: 100, 0x44d75c: 100, 0x44d764: 44, 0x44d774: 1,
 }
+WAR_CELLS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 100, 100]
+# Presets 0-4 (shown as funding rounds), per cell: full-strength totals and
+# on-screen counts (a cell meant to be empty needs both at 0).
+WAR_PRESETS = [([6] * 9 + [3, 3], [3] * 11),                                   # balanced
+               ([3] * 11, [3] * 11),                                           # inferior
+               ([0, 9, 0, 0, 0, 0, 9, 0, 9, 3, 3], [0, 3, 0, 0, 0, 0, 3, 0, 3, 3, 3]),   # ranged: Vector, Prompt, Angel
+               ([9, 0, 0, 9, 0, 9, 0, 0, 0, 3, 3], [3, 0, 0, 3, 0, 3, 0, 0, 0, 3, 3]),   # melee: Blitz, Moonshot, Gigawatt
+               ([0, 0, 0, 0, 0, 9, 0, 0, 0, 3, 3], [0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 3])]   # giant: Gigawatt
+for _cell, _id in enumerate(WAR_CELLS): RECORD_WORDS[0x44d350 + 4 * _cell] = _id
+for _p, (_totals, _active) in enumerate(WAR_PRESETS):
+    for _cell in range(11):
+        RECORD_WORDS[0x44d388 + 4 * (_p * 11 + _cell)] = _totals[_cell]
+        RECORD_WORDS[0x44d468 + 4 * (_p * 11 + _cell)] = _active[_cell]
 
 # --- file writers -----------------------------------------------------------
 bmp_bytes = process.bmp_bytes
@@ -243,8 +260,67 @@ def stage_pictures(raw_image):
     for a in (back, floor): a[a.sum(axis=-1) == 0] = (8, 8, 16)
     return back, floor
 
+# Stage Mode, set 1 (stages 1-1..1-5): the founder fights through the valley.
+# Phases spawn enemies by fighter ID (no `music:`: the engine has no phase
+# music); the set ends after 1-5 (stage 5 is undefined) with the ENDING.
+STAGES_TEXT = """
+<stage> id: 0
+<phase> bound: 800
+id: 8 hp: 120 times: 2
+id: 7 hp: 150
+<phase_end>
+<phase> bound: 1500
+id: 8 hp: 120 times: 3
+id: 10 hp: 180
+<phase_end>
+<stage_end>
+
+<stage> id: 1
+<phase> bound: 800
+id: 3 hp: 200
+id: 9 hp: 200
+<phase_end>
+<phase> bound: 1500
+id: 3 hp: 250
+id: 9 hp: 250
+id: 8 hp: 120 times: 2
+<phase_end>
+<stage_end>
+
+<stage> id: 2
+<phase> bound: 1000
+id: 2 hp: 250
+id: 5 hp: 250
+<phase_end>
+<phase> bound: 1500
+id: 2 hp: 300 times: 2
+id: 5 hp: 300
+<phase_end>
+<stage_end>
+
+<stage> id: 3
+<phase> bound: 800
+id: 4 hp: 250
+id: 10 hp: 250
+id: 7 hp: 200
+<phase_end>
+<phase> bound: 1500
+id: 4 hp: 300 times: 2
+id: 10 hp: 300
+<phase_end>
+<stage_end>
+
+<stage> id: 4
+<phase> bound: 1500
+id: 6 hp: 900 <boss>
+id: 8 hp: 120 <soldier>
+id: 1 hp: 140 <soldier>
+<phase_end>
+<stage_end>
+
+"""
 def stage_text():
-    return "\n<stage> id: 0\n<phase> bound: 900\nid: 2 x: 700 hp: 150 times: 1\n<phase_end>\n<stage_end>\n\n"
+    return STAGES_TEXT
 
 def control_text():
     keys = [[0x26, 0x28, 0x25, 0x27, 0x41, 0x53, 0x44],          # P1: arrows, A attack, S jump, D defend

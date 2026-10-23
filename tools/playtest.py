@@ -46,9 +46,57 @@ def mode(row, cycles=1600):
     s += [tap(c2, ATTACK) for c2 in range(ready + 220, cycles, 30)]
     return "; ".join(s), cycles
 
+def select_mode(row):
+    s, c = [], 6
+    for _ in range(row): s.append(tap(c, DOWN)); c += 4
+    return s, c + 2
+
+def stage(cycles=3600):
+    """Stage Mode: player 1 picks the first founder; the settings screen's
+    cursor starts on its third option (Up, Up, then Attack starts)."""
+    s, t0 = select_mode(1); s.append(tap(t0, ATTACK))
+    s += [tap(t0 + 10, ATTACK), tap(t0 + 14, RIGHT), tap(t0 + 18, ATTACK), tap(t0 + 22, ATTACK)]
+    ready = t0 + 22
+    s += [tap(ready + 160, ATTACK), tap(ready + 170, UP), tap(ready + 174, UP), tap(ready + 178, ATTACK)]
+    for c in range(ready + 260, cycles, 12):          # walk right and punch
+        s += [f"{c} hold {RIGHT} 8", tap(c + 9, ATTACK)]
+    return "; ".join(s), cycles
+
+def battle(cycles=2400):
+    """Battle Mode: player 1 and one computer (Random), then War menu 200
+    (Attack opens 202) and 202 (Up, Up, Attack starts)."""
+    s, t0 = select_mode(4); s.append(tap(t0, ATTACK))
+    s += [tap(t0 + 10, ATTACK), tap(t0 + 14, RIGHT), tap(t0 + 18, ATTACK), tap(t0 + 22, ATTACK)]
+    ready = t0 + 22
+    s.append(tap(ready + 160, ATTACK))
+    for k in range(3): s.append(tap(ready + 166 + 4 * k, RIGHT))
+    s += [tap(ready + 178, ATTACK), tap(ready + 182, ATTACK)]
+    w = ready + 220
+    s += [tap(w, ATTACK), tap(w + 20, UP), tap(w + 24, UP), tap(w + 28, ATTACK)]
+    s += [tap(c, ATTACK) for c in range(w + 80, cycles, 15)]
+    return "; ".join(s), cycles
+
+def championship(row=2, cycles=4000):
+    """Championship (row 2) or 2 on 2 (row 3): menu 21 sets the eight entries
+    (Left/Right picks a founder, Attack locks it, Left/Right toggles Computer/
+    Human, Attack confirms; the first entry is player 1's, Human), menu 22
+    (Right, Attack: no shuffle), menu 25 (Up, Up, Attack: start), then the
+    bracket: Jump skips the waits, Attack claims and confirms player 1's
+    pairing (Left/Right moves the Yes/No cursor)."""
+    s, t0 = select_mode(row); s.append(tap(t0, ATTACK)); c = t0 + 20
+    for entry in range(8):
+        s += [tap(c, RIGHT), tap(c + 6, ATTACK)]
+        if entry == 0: s.append(tap(c + 12, RIGHT))
+        s.append(tap(c + 18, ATTACK)); c += 26
+    s += [tap(c + 10, RIGHT), tap(c + 16, ATTACK), tap(c + 40, UP), tap(c + 46, UP), tap(c + 52, ATTACK)]
+    for k in range(c + 120, cycles, 24):
+        s += [tap(k, JUMP), tap(k + 8, LEFT), tap(k + 14, ATTACK)]
+    return "; ".join(s), cycles
+
 RUNS = {f"vs-{stem}": (lambda o=i: vs(o)) for i, stem in enumerate(STEMS)}
-RUNS.update({"stage": lambda: mode(1), "championship": lambda: mode(2), "2on2": lambda: mode(3),
-             "battle": lambda: mode(4), "demo": lambda: mode(5, 1400)})
+RUNS.update({"stage": stage, "championship": lambda: championship(2), "2on2": lambda: championship(3),
+             "battle": battle, "demo": lambda: mode(5, 1400)})
+CAPTURES = [int(c) for c in os.environ.get("PLAYTEST_CAPTURES", "").split(",") if c]
 
 def run(name):
     script, cycles = RUNS[name]()
@@ -59,7 +107,8 @@ def run(name):
     extra = ["--original-menu-input"] if not name.startswith("vs-") else []
     args = [str(B / "swiftpm/release/BurnRateHeadless"), *extra, "--resources", str(B / "content"), "--music-dir", str(B / "content/OriginalMusic"),
             "--virtual-clock", "123456789", "8", "--no-network", "--mute-music", "--mute-sounds", "--overlay", str(out / "overlay"),
-            "--script", "8 click 398 229; 90000 exit", "--loaded-script", f"{script}; {cycles} capture {out}/end.png; {cycles + 2} exit"]
+            "--script", "8 click 398 229; 90000 exit",
+            "--loaded-script", f"{script}; " + "".join(f"{c} capture {out}/c{c}.png; " for c in CAPTURES) + f"{cycles} capture {out}/end.png; {cycles + 2} exit"]
     p = subprocess.run(args, capture_output=True, text=True, timeout=900)
     (out / "run.log").write_text(p.stdout + p.stderr)
     events, boundary, bodies = Counter(), None, 0

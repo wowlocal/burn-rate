@@ -56,7 +56,7 @@ startup founders fight. ассеты будешь генерировать пр�
 | G3 | Stages (backgrounds, layers, shadow) and items | **done** (2026-10-23: four stages, the coffee item; the built-in road waits for E10's name) |
 | G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | **done** (2026-10-23; LF2's credit lines wait for E10) |
 | G5 | Sound effects and music | **done** (2026-10-23, synthesized) |
-| G6 | macOS app (.app on NTSD-Builds), window title, playtest | |
+| G6 | macOS app (.app on NTSD-Builds), window title, playtest | **done** (2026-10-23) |
 
 ## Ledger
 
@@ -160,7 +160,23 @@ startup founders fight. ассеты будешь генерировать пр�
   troop tables); Championship and 2 on 2 run but the script never starts
   a match. Surveying both modes' needs.
 
+- 2026-10-23 G6 (modes): from a read-only survey, game data only (no
+  engine change). Stage Mode: numberedStages 0..<60, finalStageSet 0..<10,
+  stageBackgrounds for every set the settings screen picks, stage.dat with
+  stages 1-1..1-5 (interns and the streamer, the investors, the
+  researchers, the hype, then Gigawatt as the boss with interns and Blitz
+  as soldiers; no phase music: the engine has none). Battle Mode: warTroops
+  founders 1-9 and the coffee, troop HP, the record's War words (eleven
+  cells 0x44d350.., 0x44d37c = 11, presets' totals 0x44d388.. and on-screen
+  counts 0x44d468.., defence 100, the bitmaps' load flag 0x44d774 = 1).
+  Playtest (tools/playtest.py, all fifteen runs pass, no boundary): VS with
+  each of the ten founders, Stage (3386 bodies on Demo Day), Championship
+  and 2 on 2 (entries, shuffle, bracket, a 1 on 1 match, back to the menu),
+  Battle (both sides Balanced, troops on the road, 2104 bodies), Demo.
+
 ## Next task
 
-G6: Stage Mode and Battle Mode content (stages, stage-to-background map,
-War troops and record words) after the survey; Championship input flow.
+Optional polish, for the user to steer: more stage sets (2-1 onward) and
+backgrounds (Random draws only from ordinals 0..count-4 and the road), the
+bracket's progress-bar coordinates (0x44d120..), balance from real play,
+SDL/web builds (the music would need CAF/ALAC).

@@ -48,10 +48,16 @@ public enum BurnRateRules {
         items: .init(itemRange: OriginalIDRange(itemRange), scarceDropItems: OriginalIDSet([]), scarceRequestedItem: -1, spawnHP200: -1,
                      keptOnScreen: OriginalIDSet([]), hpDrink: -1, mpDrink: -1),
         roster: .init(hiddenRoster: OriginalIDSet([]), randomCandidates: OriginalIDRange(fighterIDs), bracketFavourites: OriginalIDSet([])),
-        modes: .init(survivalStages: OriginalIDRange(0..<0), numberedStages: OriginalIDRange(0..<0), finalStageSet: OriginalIDRange(0..<0),
-                     stageWeightPlus1: -1, stageWeightPlus2: -1, warTroops: OriginalIDSet([]), stageBackgrounds: [:],
+        // Stage Mode: one set (stages 1-1..1-5, ids 0-4, tools/content/stage.py),
+        // which ends the run (the ENDING); every set the settings screen can
+        // pick has a stage background. Battle Mode: founders 1-9 and the coffee
+        // are the War's troops (cells and presets in the record, stage.py).
+        modes: .init(survivalStages: OriginalIDRange(0..<0), numberedStages: OriginalIDRange(0..<60), finalStageSet: OriginalIDRange(0..<10),
+                     stageWeightPlus1: -1, stageWeightPlus2: -1, warTroops: OriginalIDSet([1, 2, 3, 4, 5, 6, 7, 8, 9, 100]),
+                     stageBackgrounds: [0: 0, 10: 1, 20: 2, 30: 3, 40: 0, 50: 1],
                      killRequestSpared: -1, fixedDifficultyHP: -1, heroSpawnWord: -1, troopSpawnWord: -1, troopOrBossSpawnWord: -1,
-                     spawnTroops: OriginalIDRange(0..<0), bossTroop: -1, warUnitLife: [:], warSideZeroMarks: [:]),
+                     spawnTroops: OriginalIDRange(0..<0), bossTroop: -1,
+                     warUnitLife: [1: 200, 2: 200, 3: 200, 4: 200, 5: 200, 6: 260, 7: 200, 8: 160, 9: 200], warSideZeroMarks: [:]),
         physics: .init(extraDrift: -1, reverseDrift: -1, lowGravityThrow: -1, midGravityThrow: -1, highGravityThrow: -1, restingPiece: -1,
                        revivalPicture: OriginalIDRange(0..<0), revivalEffect: -1),
         drawing: .init(shadowless: OriginalIDSet([]), unlabelledComputers: OriginalIDSet([])),
