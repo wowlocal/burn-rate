@@ -1,0 +1,30 @@
+Create ONE new image: sprite sheet B, a companion to the supplied sprite sheet A.
+
+Input image: vesta_A.png is the visual reference for the SAME fictional character, Vesta. Match the character identity, exact costume design and colours, silver bob hairstyle, face, compact proportions about 5 heads tall, dark navy outline colour, pixel size, pixel-art rendering and scale of the reference. Preserve those visual invariants rigorously; change only her poses to the twelve new poses specified below. Do not repeat the poses from A.
+
+Asset: 2D side-scrolling fighting game sprite sheet, 1990s arcade beat-'em-up pixel art. Crisp deliberate pixel clusters, limited palette, dark NAVY (never pure black) 1-pixel outlines at the source pixel-art scale. No antialiased illustration, no smooth vector contours. Same overall 4:3 landscape composition as the reference, full-resolution output.
+
+Background: one completely flat, opaque, solid magenta RGB(255,0,255), hex #FF00FF, everywhere outside the character sprites. No gradients, no shadows, no floor, no ground line, no effects, no props, no text, no numbers, no grid lines, no frames.
+
+Character: Vesta, fictional sharp venture capitalist woman in her forties. Sleek silver bob haircut; navy fleece vest over light-blue button-down shirt with rolled sleeves; grey slacks; brown loafers; gold watch. Confident smirk in neutral/action poses, with the specified pain expression for recoils. Copy the provided reference design and palette exactly, not a redesign.
+
+Layout: EXACTLY 4 columns x 3 rows = twelve separate full-body poses, ONE pose in each invisible cell, in reading order. Generous clear magenta gaps around every sprite, no touching between cells, no cropped heads, limbs or shoes. All twelve sprites represent the identical character at identical anatomical size and proportions; do not shrink the horizontal poses to accommodate their width. All poses face RIGHT, including recoil and knockdown poses; backwards movement travels left while her front faces right. Fit horizontal poses within their own cells with ample padding. The crouching and tucked poses have naturally shorter bounding boxes, but body parts retain the same scale.
+
+Required poses, reading left to right, top to bottom:
+TOP ROW
+1 (row 1, col 1): crouch before a jump, both knees bent, body compressed ready to spring.
+2 (row 1, col 2): jumping up, both knees tucked toward chest, airborne.
+3 (row 1, col 3): airborne at the top of a jump, a distinct apex pose, arms balancing, legs below torso.
+4 (row 1, col 4): airborne flying kick, one leg fully extended forward RIGHT and diagonally DOWN, other leg bent.
+MIDDLE ROW
+5 (row 2, col 1): low forward dash lunge toward RIGHT, torso leaning forward low, rear leg extended back.
+6 (row 2, col 2): guard block, BOTH forearms CROSSED in front of face.
+7 (row 2, col 3): hit recoil A, head snapped back while still facing right, wincing, torso recoiling.
+8 (row 2, col 4): hit recoil B, doubled over forwards, one hand clutching stomach, visible pain.
+BOTTOM ROW
+9 (row 3, col 1): knocked off feet, flying backwards to the LEFT, body HORIZONTAL and airborne, front still facing right.
+10 (row 3, col 2): lying FLAT on her back, body HORIZONTAL, head at LEFT and feet at RIGHT, face turned slightly right/up consistent with right-facing character; no drawn floor or shadow.
+11 (row 3, col 3): getting up from ONE KNEE, upright torso facing right, one knee on implied ground, other foot planted.
+12 (row 3, col 4): landing crouch after a jump, deep bent knees absorbing impact, torso leaned forward, distinct from pre-jump crouch.
+
+All twelve are single-character full-body animation poses in the same reference style. Produce only this one complete sprite sheet.

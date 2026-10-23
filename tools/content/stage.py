@@ -6,7 +6,7 @@ the builder encrypts them), sprite sheets made by tools/art/process.py from
 the raw Codex art, interface pictures, sounds, music and the initial record.
 Pictures still to be drawn are plain placeholders.
 
-Usage: stage.py STAGE_DIR   (raw art from $BURNRATE_RAW, default on NTSD-Builds)
+Usage: stage.py STAGE_DIR   (raw art from $BURNRATE_RAW, default art/raw)
 """
 import json, math, os, shutil, struct, subprocess, sys
 from pathlib import Path
@@ -17,7 +17,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools" / "art")); sys.path.insert(0, str(ROOT / "tools" / "content"))
 import process  # noqa: E402
 
-RAW = Path(os.environ.get("BURNRATE_RAW", "/Volumes/NTSD-Builds/tasks/burnrate/art/raw"))
+# The raw art: the repository's half-size archive (tools/art/archive.py) unless
+# BURNRATE_RAW names the full-size Codex outputs.
+RAW = Path(os.environ.get("BURNRATE_RAW", ROOT / "art" / "raw"))
 CHARACTERS = json.loads((ROOT / "art" / "characters.json").read_text())
 
 # --- names shared with Sources/BurnRateRules/BurnRateRules.swift ---------------

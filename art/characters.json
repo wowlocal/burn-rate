@@ -5,7 +5,13 @@
     "description": "'Blitz', a twenty-something Silicon Valley AI startup founder: messy brown hair, grey zip hoodie over a black t-shirt with a small yellow lightning logo, dark blue jeans, white sneakers, black smartwatch, cocky grin.",
     "special_windup": "pulling back a glowing stack of presentation slides",
     "special_release": "flinging the slides forward like throwing cards",
-    "height": 66
+    "height": 66,
+    "stats": {
+      "walk": 4.2,
+      "run": 8.5,
+      "power": 1.0,
+      "jump": -15.5
+    }
   },
   "vector": {
     "id": 2,
@@ -13,7 +19,13 @@
     "description": "'Dr. Vector', a lanky machine-learning research scientist in his thirties: round glasses, short dark hair with a cowlick, white lab coat over a teal sweater, khaki trousers, brown sneakers, a lanyard badge, an intense focused expression.",
     "special_windup": "charging a glowing cyan ball of energy between both hands",
     "special_release": "both palms thrust forward releasing the energy",
-    "height": 68
+    "height": 68,
+    "stats": {
+      "walk": 3.8,
+      "run": 7.6,
+      "power": 0.95,
+      "jump": -15.0
+    }
   },
   "vesta": {
     "id": 3,
@@ -21,7 +33,13 @@
     "description": "'Vesta', a sharp venture capitalist woman in her forties: sleek silver bob haircut, navy fleece vest over a light blue button-down shirt, grey slacks, brown loafers, gold watch, confident smirk.",
     "special_windup": "raising a rolled-up contract like a baton",
     "special_release": "hurling the contract forward",
-    "height": 64
+    "height": 64,
+    "stats": {
+      "walk": 4.0,
+      "run": 8.0,
+      "power": 1.05,
+      "jump": -15.0
+    }
   },
   "moonshot": {
     "id": 4,
@@ -29,7 +47,13 @@
     "description": "'Moonshot', a loud hype-bro founder who pivoted from crypto to AI: slicked-back blond hair, mirrored aviator sunglasses, unbuttoned purple shirt with a gold chain, white chinos, orange high-top sneakers, a wide grin.",
     "special_windup": "flipping a big gold coin up with the thumb",
     "special_release": "punching the gold coin forward",
-    "height": 68
+    "height": 68,
+    "stats": {
+      "walk": 4.4,
+      "run": 9.0,
+      "power": 0.95,
+      "jump": -16.0
+    }
   },
   "ada": {
     "id": 5,
@@ -37,7 +61,13 @@
     "description": "'Ada', a calm AI-safety research lead woman: long dark braid, green cardigan over a white blouse, black trousers, sturdy boots, small headset microphone, a serious determined expression.",
     "special_windup": "raising one open palm with a glowing green hexagon shield forming",
     "special_release": "pushing the glowing green shield forward",
-    "height": 64
+    "height": 64,
+    "stats": {
+      "walk": 4.0,
+      "run": 8.2,
+      "power": 0.95,
+      "jump": -15.5
+    }
   },
   "gigawatt": {
     "id": 6,
@@ -45,7 +75,13 @@
     "description": "'Gigawatt', a huge muscular compute baron who hoards GPUs: shaved head and a thick red beard, yellow hard hat, black tank top with a circuit-board print, cargo pants, heavy work boots, a glowing green GPU card strapped to his back.",
     "special_windup": "lifting a big glowing GPU card over his head",
     "special_release": "throwing the GPU card forward",
-    "height": 76
+    "height": 76,
+    "stats": {
+      "walk": 3.2,
+      "run": 6.6,
+      "power": 1.3,
+      "jump": -13.5
+    }
   },
   "prompt": {
     "id": 7,
@@ -53,7 +89,13 @@
     "description": "'Prompt', a hyperactive prompt-engineer livestreamer woman: neon pink short hair, oversized gamer headphones around the neck, black hoodie with glowing cyan patterns, ripped black jeans, chunky white platform sneakers, fingerless gloves.",
     "special_windup": "typing on a floating glowing holographic keyboard",
     "special_release": "a glowing chat bubble shooting forward from her outstretched hand",
-    "height": 62
+    "height": 62,
+    "stats": {
+      "walk": 4.6,
+      "run": 9.4,
+      "power": 0.9,
+      "jump": -16.5
+    }
   },
   "intern": {
     "id": 8,
@@ -61,7 +103,13 @@
     "description": "'Intern', a small wiry tireless startup intern: messy ginger hair, oversized bright orange company t-shirt, a lanyard with a big VISITOR badge, cargo shorts, socks with sandals, an energy drink can tucked in the belt, wide manic eyes.",
     "special_windup": "chugging an energy drink can",
     "special_release": "throwing the empty can forward",
-    "height": 58
+    "height": 58,
+    "stats": {
+      "walk": 5.0,
+      "run": 10.0,
+      "power": 0.8,
+      "jump": -17.0
+    }
   },
   "angel": {
     "id": 9,
@@ -69,6 +117,12 @@
     "description": "'Angel', a wealthy older angel investor: neat white hair and moustache, light pink polo shirt, white golf trousers, a white golf glove on one hand, two-tone golf shoes, a tanned face and a smug smile, holding a golf club.",
     "special_windup": "golf backswing with the club raised",
     "special_release": "golf follow-through after striking a ball forward",
-    "height": 65
+    "height": 65,
+    "stats": {
+      "walk": 3.6,
+      "run": 7.2,
+      "power": 1.15,
+      "jump": -14.5
+    }
   }
 }

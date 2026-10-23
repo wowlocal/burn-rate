@@ -1,0 +1,29 @@
+Generated with the built-in image_gen tool.
+Reference: intern_A.png
+
+Use case: stylized-concept.
+Create ONE new raster image: sprite sheet B for the fictional character Intern in a 2D side-scrolling fighting game. The supplied image is sprite sheet A and is the strict visual reference for character identity, exact palette, sprite scale, pixel technique, outline and proportions. Generate a matching companion sheet with twelve NEW poses, not a redesign or a copy of the existing poses.
+
+Background: one completely flat uniform solid magenta #FF00FF edge to edge, including all empty spaces. No gradients, shadows, floor, scenery, text, grid lines, separators, frames or watermark. Opaque background.
+
+Layout: landscape 4:3 sheet, exactly 4 columns by 3 rows, twelve separate complete full-body sprites, one centered in each equally sized invisible cell. Generous clear magenta gutters around every sprite, including horizontal poses; no overlap and no clipping. Keep identical character anatomy scale across all cells; do not enlarge crouching or horizontal poses to fill their cells. At the same overall canvas size the upright character should have the same height as sheet A.
+
+Character and style MUST match the reference exactly: compact wiry young male startup intern about five heads tall, messy spiky ginger/orange hair with the same silhouette, pale peach skin, big manic expressive eyes, oversized bright orange short-sleeved company t-shirt, dark navy lanyard, large pale VISITOR badge with navy border (same small pixel badge as reference, no added legible typography), khaki/olive cargo shorts with flap pockets, white socks with blue stripes, dark navy sandals with pale soles and visible toes, blue/silver energy-drink can with red accent tucked into his visible belt side. Keep the same head shape, clothing cuts, colours, accessories and proportions. Crisp 1990s arcade beat-'em-up pixel art, compact pixel clusters, limited reference palette, dark NAVY outlines never pure black, single pixel outline at native sprite pixel scale. No anti-aliasing, soft brushwork, smooth vector edges, 3D shading, realism or redesigned details.
+
+Every pose faces RIGHT. Even when hurt, falling backwards, or prone, preserve the same right-facing character orientation and visible side. Movement direction can differ from facing. For horizontal backwards-fall and lying poses, put feet toward the left and head toward the right, maintaining visible right-facing profile rather than mirroring him.
+
+Exact poses in reading order, left to right then top to bottom:
+Row 1, column 1: crouch before a jump, both knees deeply bent, torso forward, ready to spring.
+Row 1, column 2: jumping upward, both knees tightly tucked toward the chest, clearly airborne.
+Row 1, column 3: airborne at the top of a jump, more open suspended body pose, knees relaxed/bent, distinguish from tucked jump.
+Row 1, column 4: airborne flying kick, one leg fully extended forward AND diagonally DOWN toward the right, other leg bent back; full body visible.
+Row 2, column 1: low forward dash lunge to the right, very low torso and bent leading knee, rear leg stretched behind.
+Row 2, column 2: guard block, both forearms crossed in front of the face, feet planted.
+Row 2, column 3: hit recoil A, head snapped back and wincing, upper body arched backward while still right-facing.
+Row 2, column 4: hit recoil B, doubled over forward, one hand clutching stomach, pained expression.
+Row 3, column 1: knocked off feet flying backwards to the left, entire body horizontal and airborne, head at right, feet at left, arms flung out.
+Row 3, column 2: lying flat on back on invisible ground, entire body horizontal, head at right, feet at left. No drawn ground or shadow.
+Row 3, column 3: getting up from one knee, one knee down and the other foot planted, leaning forward, facing right.
+Row 3, column 4: landing crouch after a jump, deep bent knees absorbing the landing, distinguish from first crouch with arms spread for balance and a lower torso.
+
+Produce only this one complete sprite-sheet image. Preserve all reference design invariants meticulously.

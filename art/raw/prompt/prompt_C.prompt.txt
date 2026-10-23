@@ -1,0 +1,22 @@
+Use case: stylized-concept
+Asset type: production sprite sheet C for a 2D side-scrolling fighting game.
+Reference image: /Volumes/NTSD-Builds/tasks/burnrate/art/raw/prompt/prompt_A.png is the authoritative character model and pixel-art style. Create ONE NEW image of the EXACT SAME fictional character, with eight NEW poses. Replace the source sheet's 4-by-3 pose layout with a 4-column by 2-row layout. Preserve identity, costume, colours, outline colour, sprite scale, anatomy and proportions precisely.
+
+Scene/backdrop: one flat opaque solid magenta #FF00FF everywhere outside sprites and the two requested hologram effects. No gradients, shadows, floor, scenery, text, labels, grid lines, panel borders, frames or watermark.
+
+Subject: 'Prompt', a hyperactive prompt-engineer livestreamer woman. Exactly match reference: neon pink short windswept hair with cowlick and side fringe, youthful face, oversized dark navy gamer headphones with cyan and pink earcups around the NECK, dark navy/black cropped hoodie with bright cyan geometric markings, white cropped top, exposed midriff, belt and cyan hip chain, ripped fitted dark navy jeans with skin showing at knees/thighs, chunky white platform sneakers with cyan details, dark fingerless gloves. Keep the same compact approximately 5-head-tall proportions, limited palette, hand-placed crisp pixel clusters and dark NAVY (never pure black) thin 1-pixel outlines. Match the reference sprite rendering and pixel density closely. No smooth illustration, antialiasing, 3D, blur, painterly effects or redesign.
+
+Composition: wide landscape sprite sheet; exactly FOUR columns and TWO rows, exactly EIGHT separate full-body sprites with generous uninterrupted magenta gutters. Every body faces RIGHT and every face looks RIGHT, including the spin, victory and exhausted poses. Every pose uses the exact same body scale and head size as the reference (reference normal standing figure roughly 290 px tall in a 1536 px-wide sheet); do not enlarge sprites to fill the extra row space. Allow room above raised fists and beside projectile. All limbs, hair, shoes, keyboard and chat bubble completely inside their own cell with clear margins and no overlap between cells.
+
+Eight distinct poses in reading order:
+TOP ROW, column 1: signature move wind-up. Right-facing stance, both gloved hands actively typing on a floating glowing CYAN holographic keyboard in front of her waist/chest. Hologram is crisp limited-palette cyan pixels, with key shapes but NO text, no soft glow spilling onto background.
+TOP ROW, column 2: signature move release. Dynamic right-facing forward lunge, one hand outstretched toward the RIGHT and a clearly recognizable glowing CYAN CHAT BUBBLE projectile shooting forward just beyond her palm. Bubble contains no text, with a pointed speech-tail and simple pixel highlights. Use only crisp cyan/white pixels, no gradients.
+TOP ROW, column 3: rising uppercut. Powerful upward body motion, one gloved fist extended HIGH ABOVE her head, knees lifting/bending, body and face toward RIGHT; full body and raised fist visible.
+TOP ROW, column 4: running shoulder charge. Leaning forward low toward RIGHT, leading shoulder thrust forward, arms tucked, running stride; head facing right.
+
+BOTTOM ROW, column 1: spinning back fist. Dynamic twisting torso, back of gloved fist sweeping out toward RIGHT at shoulder height, head and face RIGHT, balanced pivot stance with both shoes visible. No duplicate limbs, no motion ghosts.
+BOTTOM ROW, column 2: triumphant victory. Right-facing full-body profile/three-quarter game sprite, both clenched fists raised overhead in a celebratory V, confident happy expression, feet apart.
+BOTTOM ROW, column 3: exhausted. Right-facing full-body sprite bent forward at the waist with BOTH hands resting on knees, head drooping but visible right profile, feet planted, tired expression.
+BOTTOM ROW, column 4: taunt. Right-facing cocky stance, one arm extended and index finger POINTING FORWARD TO THE RIGHT, other hand at hip, playful confident expression.
+
+Critical invariants: exact reference character design and palette; exactly 8 complete poses; 4 columns x 2 rows; all face RIGHT; equal scale; full-body uncropped; solid #FF00FF background; no text whatsoever. Keep output at full native resolution.
