@@ -29,7 +29,9 @@ startup founders fight. ассеты будешь генерировать пр�
   no AI special moves; the library value set with our loading labels.
 - **Roster**: at least 9 fighters (Random and the Demo draw 8 distinct
   eligible characters beyond catalog ordinal 0).
-- **Publication**: nothing is published (no remote) without asking the user.
+- **Publication**: public at https://github.com/wowlocal/burn-rate since
+  2026-10-23, the user's decision ("публикуй игру ... игру пусть публикует в
+  новую репу"); engine changes go to Randori, not into this repository.
 - **Engine contract**: [ENGINE_CONTRACT.md](ENGINE_CONTRACT.md) (survey of
   what a game supplies).
 
@@ -174,6 +176,15 @@ startup founders fight. ассеты будешь генерировать пр�
   each of the ten founders, Stage (3386 bodies on Demo Day), Championship
   and 2 on 2 (entries, shuffle, bracket, a 1 on 1 match, back to the menu),
   Battle (both sides Balanced, troops on the road, 2104 bodies), Demo.
+
+- 2026-10-23 publication: local paths dropped (989de38: build/ default,
+  BURNRATE_PYTHON/BURNRATE_TOOLCHAIN/BURNRATE_RAW). Checked before the push: a
+  fresh clone, its submodule fetched from github.com/wowlocal/randori (786befd),
+  builds with no BURNRATE_RAW/BURNRATE_CONTENT in 122 s, leaves its tree clean
+  (GeneratedIdentity.swift reproduced), writes content packages identical to the
+  local build's, passes the smoke check and all 15 playtest runs. Pushed as
+  wowlocal/burn-rate (public); a recursive clone from GitHub has the tested tree
+  (f4f2c70). No license file yet (the user's choice).
 
 ## Next task
 
