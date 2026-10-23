@@ -128,8 +128,17 @@ startup founders fight. ассеты будешь генерировать пр�
   AVAudioPlayer). Checked: levels (music peak 0.78, RMS ~0.11; effects
   peak ≤ 0.98), the AppKit app starts with the packaged tracks.
 
+- 2026-10-23 G6 (branding): Randori 786befd (E10, game-supplied branding:
+  reviewed, CI pending, NTSD's gate pending in ntsd-2.4) at Vendor/randori;
+  BurnRateRules.branding: window "Burn Rate" (class BurnRate), quit caption
+  "Burn Rate", credit lines "by BurnRateHQ, Randori Team" / "2026, an
+  experimental brawler." / "github.com/wowlocal/randori " (the engine's
+  lengths 27/30/28, the spans BurnRateHQ and Randori Team), every link to
+  the Randori repository, the built-in road named "Highway 101". Checked:
+  the AppKit title screen shows the game's lines; the smoke check passes.
+
 ## Next task
 
-E10 in the engine (implemented, in review): then bump Vendor/randori and set
-Burn Rate's branding (window title, credit lines, links, "Highway 101");
-G5 sounds and music.
+G6: a full playtest pass in the AppKit app (every founder's specials, the
+four stages and the road, the result screen), balance, and E10's NTSD gate
+in ntsd-2.4 before calling the engine revision settled.

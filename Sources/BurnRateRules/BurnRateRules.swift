@@ -22,6 +22,22 @@ public enum BurnRateRules {
     public static let library = OriginalLibData(loadingLabels: .init(belowTwo: Array("Raising seed".utf8),
         fiveToSeven: Array("Burning cash".utf8), others: Array("Scaling up..".utf8)))
 
+    /// The strings the engine shows for the game (window, quit box, the title
+    /// screen's credit lines and their links, the built-in road's name). The
+    /// credit lines keep the engine's lengths (27, 30, 28); in line 1, bytes
+    /// 3..<13 and 15..<27 are the clickable spans.
+    public static let branding: OriginalGameRules.Branding = {
+        let home = Array("https://github.com/wowlocal/randori".utf8)
+        do {
+            return try OriginalGameRules.Branding(windowClass: Array("BurnRate".utf8), windowTitle: Array("Burn Rate".utf8),
+                shortName: Array("Burn Rate".utf8),
+                credits: [Array("by BurnRateHQ, Randori Team".utf8), Array("2026, an experimental brawler.".utf8),
+                          Array("github.com/wowlocal/randori ".utf8)],
+                creditLinks: [home, home, home], website: home, controlHelp: home, recordingHelp: home, challenge: home,
+                advertise: home, forum: home, builtInBackgroundName: Array("Highway 101".utf8))
+        } catch { fatalError("Burn Rate branding: \(error)") }
+    }()
+
     public static let rules = OriginalGameRules(profile: "Burn Rate",
         reflection: .init(reflectable: OriginalIDSet([]), reflector: -1, rebinder: -1, heldRebinder: -1),
         armour: .init(guardPenetrators: OriginalIDSet([]), steadyArmour: -1, openingArmour: -1, attackerArmour: -1,
@@ -53,7 +69,7 @@ public enum BurnRateRules {
                            drinks: OriginalIDSet([]), rangedBand: OriginalIDSet([]), rangedJoiner: -1, meleeWeapons: OriginalIDSet([]),
                            rollingWeapon: -1, thrownWeapons: OriginalIDSet([]), dashCounters: OriginalIDSet([]), dashJumper: -1, shortDasher: -1),
         characterAISpecial: NoSpecialMoves(),
-        library: library)
+        library: library, branding: branding)
 }
 
 /// No ID-specific AI routines: the computer plays every fighter with the
