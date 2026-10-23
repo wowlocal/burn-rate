@@ -33,11 +33,26 @@ MENU = ["BR_CHARMENU"] + [f"BR_CM{i}" for i in range(1, 6)] + ["BR_CMA", "BR_CMA
 WAR = ["BR_BATTLEMODE", "BR_BATTLETROOPS"]
 WAR_MODE_FRAMES = [[0, 0, 705, 400], [0, 471, 705, 16]]
 
+# The Stage Mode epilogue (docs/STORY.md), one (title, lines) per ENDING page.
+ENDING_PAGES = [
+    ("SERIES \u03a9: CLOSED", ["You walked out of the boardroom with the check.", "The last page of the term sheet gave Omega the board.",
+                              "You are rich. You are also an employee.", "", "Win on Difficult to read the last page first."]),
+    ("SERIES \u03a9: ON YOUR TERMS", ["You read the last page before you signed.", "Omega was Vesta's and Gigawatt's fund all along.",
+                                     "You struck the clause, kept the board and shipped.", "", "The runway is yours."]),
+    ("WHERE ARE THEY NOW", ["Blitz is back in a garage, building the next one.", "Dr. Vector published the paper. It cites you.",
+                            "Vesta is raising Fund IX.  Moonshot pivoted to quantum.", "Ada's safety report is an industry standard.",
+                            "Gigawatt sells you GPUs, at a markup.", "Prompt streamed every fight to ten million followers.",
+                            "The Intern got the full-time offer.  Angel is golfing.", "Viral is growth-hacking your launch."]),
+    ("BURN RATE", ["A game on the Randori engine.", "Art: Codex CLI image generation.", "Sound and music: synthesized.",
+                   "Every founder is fictional."]),
+    ("THE END", ["Your runway: infinite.", "Your burn rate: still too high.", "Thanks for playing!"]),
+]
+
 # The front sheets: the engine slot (a front bitmap's global) and each frame's
 # size, in frame order (sizes the engine's screens place at fixed positions).
 SHEETS = {
     "BR_SLOGAN": (0x45119c, [(298, 132)] * 4),
-    "BR_ENDING": (0x451190, [(402, 66), (402, 91), (402, 156), (419, 169), (419, 65), (15, 13)]),
+    "BR_ENDING": (0x451190, [(600, 190), (600, 190), (640, 260), (520, 170), (460, 140), (15, 13)]),
     "BR_CLIP1": (0x4511a0, [(794, 37), (496, 80), (282, 119), (304, 126), (363, 123), (291, 27), (291, 27), (256, 26), (256, 26),
                             (256, 29), (334, 108), (334, 108), (151, 26), (151, 26), (304, 38), (29, 19), (29, 19), (29, 19), (37, 19),
                             (70, 19), (70, 19), (110, 19), (102, 19), (45, 19), (37, 19)]),
@@ -244,8 +259,9 @@ def sheet_frames(name, sizes, misc):
         put(11, row(62, 13, "...")); put(12, keyed_text(71, 9, "NEWS", DIM, FONT_LABEL))
         put(13, keyed_text(147, 10, "made with Randori", HOT_INK, FONT_LABEL)); put(14, keyed_text(147, 10, "made with Randori", DIM, FONT_LABEL))
     elif name == "BR_ENDING":
-        for i, s in enumerate(("THE END", "THE END", "BURN RATE", "Every founder exited.", "Thanks for playing")):
-            put(i, page(W(i), H(i), None)); text(frames[i], s, (10, 10, W(i) - 20, min(40, H(i) - 20)), (255, 190, 90), FONT_TITLE)
+        # The epilogue of docs/STORY.md: f0 after Easy/Normal, f1 after
+        # Difficult/CRAZY!, then f2-f4 for both.
+        for i, (title, lines) in enumerate(ENDING_PAGES): put(i, page(W(i), H(i), title, lines))
         put(5, keyed_text(15, 13, ">", HOT, FONT_LABEL))
     for i, f in enumerate(frames):
         if f is None: frames[i] = page(*sizes[i]) if sizes[i][0] > 40 and sizes[i][1] > 20 else row(*sizes[i], "")

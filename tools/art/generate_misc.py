@@ -25,6 +25,12 @@ JOBS = {
         "blue lights, cable trays overhead, cool blue lighting, a perforated grey raised-floor of tiles as the floor."),
     "stage_office": STAGE.format(style=STYLE, scene="an open-plan startup office: standing desks, giant monitors, bean bags, a "
         "ping-pong table, a kombucha tap, big windows with a city skyline, a light concrete floor."),
+    "stage_garage": STAGE.format(style=STYLE, scene="a cramped Palo Alto garage turned startup headquarters at night: a "
+        "whiteboard full of arrows and boxes, a folding table with three laptops, tangled cables, pizza boxes, a half-open "
+        "roll-up door showing a suburban street under orange streetlights, a stained grey concrete floor."),
+    "stage_boardroom": STAGE.format(style=STYLE, scene="a glass-walled boardroom on the top floor of a skyscraper at dusk: "
+        "a very long black table with leather chairs pushed back, a giant wall screen showing a red and green chart, "
+        "floor-to-ceiling windows over a glittering Bay Area skyline and the bay, a polished dark marble floor."),
     "props": ("Use one flat solid magenta (#FF00FF) background everywhere, no gradients, no shadows, no floor. A sprite sheet of "
         f"small game effect and projectile sprites {STYLE}, arranged in a 6 columns x 4 rows grid with generous magenta space "
         "between them, each sprite centred in its cell, all at a similar small scale. Row 1: a fanned stack of flying presentation "

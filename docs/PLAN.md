@@ -60,6 +60,7 @@ startup founders fight. ассеты будешь генерировать пр�
 | G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | **done** (2026-10-23; LF2's credit lines wait for E10) |
 | G5 | Sound effects and music | **done** (2026-10-23, synthesized) |
 | G6 | macOS app (BurnRate.app), window title, playtest | **done** (2026-10-23) |
+| G7 | Story and missions ([STORY.md](STORY.md)): six acts as Stage Mode's six sets, two new arenas, the epilogue on the ENDING pages; screenshots in the README | **done** (2026-10-23; balance from real play open) |
 
 ## Ledger
 
@@ -190,9 +191,43 @@ startup founders fight. ассеты будешь генерировать пр�
   ntsd-2-4-02 session), holder "the Burn Rate authors" after Randori's
   NOTICE ("the Randori authors"); README names it and the engine's Apache-2.0.
 
+- 2026-10-23 G7 (story, missions, screenshots), the user's request ("попроси
+  запроектировать миссии и сюжетку и докинуть скринов в игру", relayed by the
+  ntsd-2-4-02 session). Design first: docs/STORY.md (premise "the Last Round",
+  the cast's roles, six acts of four missions with line-ups, HP and bosses, the
+  epilogue, what the engine lets a game show: arenas, line-ups, the ENDING sheet;
+  no per-stage text). Engine facts used: a set ends at its first undefined stage
+  id (stage+1 per clear), the next set is (q+1)*10, finalStageSet brings menu 300
+  (the ENDING), stageBackgrounds applies per set at the match prelude, the
+  settings screen's STAGE row steps the set on Attack (0..50, 60 wraps), the
+  ENDING shows f0 (Easy/Normal) or f1 (Difficult/CRAZY!) then f2-f4, the frame
+  rectangles are the game's (frontSheets), Random draws ordinals 0..count-4 plus
+  the road (so six arenas give Demo Day, Sand Hill Road, Server Farm and the road).
+  Implementation: Codex arenas stage_garage and stage_boardroom (70-73 s each,
+  half-size copies in art/raw/misc), stage.py ACTS (24 stages, ids 10*act+0..3)
+  and BURNRATE_CHECK_STAGE_HP (check builds only), rules finalStageSet 50..<60
+  and stageBackgrounds {0:4, 10:0, 20:1, 30:3, 40:2, 50:5}, interface.py
+  ENDING_PAGES (sizes 600x190, 600x190, 640x260, 520x170, 460x140),
+  playtest.py act1..act6 (allies, difficulty; Attack held 2 cycles, since the
+  result board misses 1-cycle taps) and the named check run `campaign`.
+  Checked: smoke pass; playtest 21/21 (the 15 runs plus act1..act6, each act on
+  its arena with its STAGE a-1 label, no boundary); a 1-HP check build (a copy
+  outside the repository) with seven computer allies walks Act 1 to Act 6 in
+  24251 cycles: six matches, every arena in order, the ENDING, then the menu;
+  acts 5-6 again: ROUND CLEAR after 5-4, the Board Room, the ENDING; the ENDING
+  at Difficult shows "SERIES Ω: ON YOUR TERMS" and at Normal "SERIES Ω:
+  CLOSED", then WHERE ARE THEY NOW, BURN RATE, THE END and the title. Difficulty
+  presses on the settings row: 0 Difficult, 1 Easy, 2 Normal. Screenshots:
+  frames from scripted BurnRate.app runs (the AppKit host draws the GDI text the
+  headless host leaves empty), Retina 1588x1100 box-scaled to 794x550 in
+  docs/screenshots; the README shows them with the story and the act table.
+  Seen, not changed: the built-in road's back layers show black gaps beside the
+  flame banner (interface.road), visible in the Demo.
+
 ## Next task
 
-Optional polish, for the user to steer: more stage sets (2-1 onward) and
-backgrounds (Random draws only from ordinals 0..count-4 and the road), the
-bracket's progress-bar coordinates (0x44d120..), balance from real play,
-SDL/web builds (the music would need CAF/ALAC).
+Optional polish, for the user to steer: balance of the campaign and the
+fighters from real play; the built-in road's back layers (black gaps); an
+engine increment in Randori that lets a game title each stage (STORY.md, "How
+the player sees the story"); the bracket's progress-bar coordinates
+(0x44d120..); SDL/web builds (the music would need CAF/ALAC).

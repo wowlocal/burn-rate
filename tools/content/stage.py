@@ -233,7 +233,8 @@ def item_text(name, stem):
 # narrower than the stage moves less, OriginalBackgroundDrawing); the floor is a
 # seamless band from the picture's lower part, as wide as the stage.
 STAGES = [(0, "Demo_Day", "demoday", "stage_demoday"), (1, "Sand_Hill_Road", "sandhill", "stage_sandhill"),
-          (2, "Server_Farm", "serverfarm", "stage_serverfarm"), (3, "Open_Office", "office", "stage_office")]
+          (2, "Server_Farm", "serverfarm", "stage_serverfarm"), (3, "Open_Office", "office", "stage_office"),
+          (4, "Garage", "garage", "stage_garage"), (5, "Board_Room", "boardroom", "stage_boardroom")]
 STAGE_WIDTH, FLOOR_TOP, Z_RANGE = 1600, 300, (322, 512)
 def bg_paths(folder):
     base = f"bg\\br\\{folder}\\"
@@ -260,67 +261,72 @@ def stage_pictures(raw_image):
     for a in (back, floor): a[a.sum(axis=-1) == 0] = (8, 8, 16)
     return back, floor
 
-# Stage Mode, set 1 (stages 1-1..1-5): the founder fights through the valley.
-# Phases spawn enemies by fighter ID (no `music:`: the engine has no phase
-# music); the set ends after 1-5 (stage 5 is undefined) with the ENDING.
-STAGES_TEXT = """
-<stage> id: 0
-<phase> bound: 800
-id: 8 hp: 120 times: 2
-id: 7 hp: 150
-<phase_end>
-<phase> bound: 1500
-id: 8 hp: 120 times: 3
-id: 10 hp: 180
-<phase_end>
-<stage_end>
+# Stage Mode: the campaign of docs/STORY.md, six acts as the engine's six
+# sets (stage ids 10*act + 0..3; a set ends at its first undefined id, the
+# last set brings the ENDING). Missions x-1..x-3 have two phases (the camera
+# stops at bound 800, then 1500); x-4 is the act's boss, whose soldiers keep
+# coming until the boss falls. No `music:`: the engine rejects phase music.
+# Entries: (founder, hp, times) or (founder, hp, "boss" | "soldier").
+FOUNDER = {"blitz": 1, "vector": 2, "vesta": 3, "moonshot": 4, "ada": 5, "gigawatt": 6, "prompt": 7, "intern": 8,
+           "angel": 9, "viral": 10}
+ACTS = [
+    [   # Act 1, Pre-Seed (the Garage)
+        [[("intern", 120, 3)], [("intern", 120, 2), ("prompt", 150, 1)]],
+        [[("viral", 180, 1), ("intern", 120, 2)], [("viral", 220, 1), ("prompt", 180, 1)]],
+        [[("angel", 200, 1), ("intern", 120, 2)], [("angel", 250, 1), ("moonshot", 200, 1)]],
+        [[("blitz", 600, "boss"), ("intern", 120, "soldier"), ("intern", 120, "soldier")]],
+    ],
+    [   # Act 2, Seed (Demo Day)
+        [[("prompt", 200, 1), ("viral", 200, 1)], [("intern", 130, 3), ("prompt", 220, 1)]],
+        [[("vector", 220, 1), ("intern", 130, 2)], [("vector", 260, 1), ("ada", 220, 1)]],
+        [[("moonshot", 240, 1), ("viral", 220, 1)], [("moonshot", 260, 1), ("blitz", 240, 1)]],
+        [[("moonshot", 700, "boss"), ("viral", 180, "soldier"), ("viral", 180, "soldier")]],
+    ],
+    [   # Act 3, Series A (Sand Hill Road)
+        [[("angel", 220, 1), ("intern", 130, 2)], [("angel", 250, 2)]],
+        [[("vesta", 250, 1), ("angel", 220, 1)], [("vesta", 280, 1), ("moonshot", 250, 1)]],
+        [[("vesta", 280, 2)], [("vesta", 280, 1), ("angel", 250, 1), ("intern", 130, 1)]],
+        [[("vesta", 800, "boss"), ("angel", 200, "soldier"), ("angel", 200, "soldier")]],
+    ],
+    [   # Act 4, Hypergrowth (the Open Office)
+        [[("intern", 130, 4)], [("intern", 130, 2), ("prompt", 220, 1)]],
+        [[("viral", 260, 1), ("moonshot", 260, 1)], [("blitz", 260, 1), ("viral", 260, 1)]],
+        [[("vector", 280, 1)], [("vector", 280, 1), ("ada", 260, 1)]],
+        [[("ada", 850, "boss"), ("vector", 220, "soldier"), ("vector", 220, "soldier")]],
+    ],
+    [   # Act 5, the Compute War (the Server Farm)
+        [[("intern", 140, 3)], [("intern", 140, 2), ("vector", 280, 1)]],
+        [[("vector", 300, 2)], [("vector", 300, 1), ("ada", 280, 1)]],
+        [[("gigawatt", 400, 1)], [("gigawatt", 400, 1), ("blitz", 280, 1)]],
+        [[("gigawatt", 1000, "boss"), ("intern", 140, "soldier"), ("vector", 240, "soldier")]],
+    ],
+    [   # Act 6, the Last Round (the Board Room)
+        [[("angel", 300, 1), ("vesta", 300, 1)], [("moonshot", 300, 1), ("angel", 300, 1)]],
+        [[("blitz", 320, 1), ("viral", 300, 1)], [("prompt", 300, 1), ("blitz", 320, 1)]],
+        [[("ada", 320, 1), ("vector", 320, 1)], [("gigawatt", 450, 1), ("vector", 320, 1)]],
+        [[("vesta", 900, "boss"), ("gigawatt", 1100, "boss"), ("angel", 220, "soldier"), ("angel", 220, "soldier")]],
+    ],
+]
+PHASE_BOUNDS = (800, 1500)
 
-<stage> id: 1
-<phase> bound: 800
-id: 3 hp: 200
-id: 9 hp: 200
-<phase_end>
-<phase> bound: 1500
-id: 3 hp: 250
-id: 9 hp: 250
-id: 8 hp: 120 times: 2
-<phase_end>
-<stage_end>
-
-<stage> id: 2
-<phase> bound: 1000
-id: 2 hp: 250
-id: 5 hp: 250
-<phase_end>
-<phase> bound: 1500
-id: 2 hp: 300 times: 2
-id: 5 hp: 300
-<phase_end>
-<stage_end>
-
-<stage> id: 3
-<phase> bound: 800
-id: 4 hp: 250
-id: 10 hp: 250
-id: 7 hp: 200
-<phase_end>
-<phase> bound: 1500
-id: 4 hp: 300 times: 2
-id: 10 hp: 300
-<phase_end>
-<stage_end>
-
-<stage> id: 4
-<phase> bound: 1500
-id: 6 hp: 900 <boss>
-id: 8 hp: 120 <soldier>
-id: 1 hp: 140 <soldier>
-<phase_end>
-<stage_end>
-
-"""
 def stage_text():
-    return STAGES_TEXT
+    """stage.dat. BURNRATE_CHECK_STAGE_HP (a check build only, never shipped)
+    gives every enemy that HP, so a scripted run can walk all six acts."""
+    check_hp = os.environ.get("BURNRATE_CHECK_STAGE_HP")
+    out = "\n"
+    for act, missions in enumerate(ACTS):
+        for m, phases in enumerate(missions):
+            out += f"<stage> id: {10 * act + m}\n"
+            bounds = PHASE_BOUNDS if len(phases) == 2 else PHASE_BOUNDS[1:]
+            for bound, entries in zip(bounds, phases):
+                out += f"<phase> bound: {bound}\n"
+                for who, hp, extra in entries:
+                    hp = int(check_hp) if check_hp else hp
+                    tail = f" <{extra}>" if isinstance(extra, str) else (f" times: {extra}" if extra > 1 else "")
+                    out += f"id: {FOUNDER[who]} hp: {hp}{tail}\n"
+                out += "<phase_end>\n"
+            out += "<stage_end>\n\n"
+    return out
 
 def control_text():
     keys = [[0x26, 0x28, 0x25, 0x27, 0x41, 0x53, 0x44],          # P1: arrows, A attack, S jump, D defend

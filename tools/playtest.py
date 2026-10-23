@@ -3,15 +3,16 @@
 specials), and every mode on the mode list. Reports each run's events and
 any engine boundary (a stop at an unsupported state).
 Usage: playtest.py [BUILD_DIR] [RUN ...]   (BUILD_DIR default build/; RUN:
-vs-<stem>, demo, stage, championship, 2on2, battle; default all)"""
+vs-<stem>, demo, stage, act1..act6, championship, 2on2, battle; default all;
+campaign, only by name, for a 1-HP check build)"""
 import json, os, subprocess, sys
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-B = Path(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith(("vs-", "demo", "stage", "champ", "2on2", "battle")) else \
+B = Path(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith(("vs-", "demo", "stage", "act", "champ", "2on2", "battle", "campaign")) else \
     ROOT / "build"
-ONLY = [a for a in sys.argv[1:] if a.split("-")[0] in ("vs", "demo", "stage", "championship", "2on2", "battle")]
+ONLY = [a for a in sys.argv[1:] if a.split("-")[0] in ("vs", "demo", "stage", "championship", "2on2", "battle", "campaign") or a[:3] == "act"]
 STEMS = list(json.loads((ROOT / "art" / "characters.json").read_text()))
 ATTACK, JUMP, DEFEND, UP, DOWN, LEFT, RIGHT = 65, 83, 68, 38, 40, 37, 39
 
@@ -62,6 +63,27 @@ def stage(cycles=3600):
         s += [f"{c} hold {RIGHT} 8", tap(c + 9, ATTACK)]
     return "; ".join(s), cycles
 
+def act(n, cycles=3000, allies=0, difficulty=0):
+    """Stage Mode from act `n` (docs/STORY.md): `allies` computer founders
+    (Random) join player 1; on the settings screen Down reaches the STAGE row,
+    Attack there steps the set by one, the DIFFICULTY row below takes
+    `difficulty` Attacks, then Up reaches FIGHT! and Attack starts."""
+    s, t0 = select_mode(1); s.append(tap(t0, ATTACK))
+    s += [tap(t0 + 10, ATTACK), tap(t0 + 14, RIGHT), tap(t0 + 18, ATTACK), tap(t0 + 22, ATTACK)]
+    ready = t0 + 22; c = ready + 156
+    for _ in range(allies): c += 4; s.append(tap(c, RIGHT))
+    c += 4; s.append(tap(c, ATTACK))
+    for _ in range(allies): s += [tap(c + 6, ATTACK), tap(c + 12, ATTACK)]; c += 12
+    c += 14; s.append(tap(c, DOWN)); c += 4
+    for _ in range(n - 1): c += 8; s.append(tap(c, ATTACK))
+    if difficulty: c += 8; s.append(tap(c, DOWN))
+    for _ in range(difficulty): c += 8; s.append(tap(c, ATTACK))
+    for _ in range(4 if difficulty else 3): c += 8; s.append(tap(c, UP))
+    c += 8; s.append(tap(c, ATTACK))
+    for k in range(c + 90, cycles, 12):      # walk right and punch (held 2: the result board misses 1-cycle taps)
+        s += [f"{k} hold {RIGHT} 8", f"{k + 9} hold {ATTACK} 2"]
+    return "; ".join(s), cycles
+
 def battle(cycles=2400):
     """Battle Mode: player 1 and one computer (Random), then War menu 200
     (Attack opens 202) and 202 (Up, Up, Attack starts)."""
@@ -96,10 +118,14 @@ def championship(row=2, cycles=4000):
 RUNS = {f"vs-{stem}": (lambda o=i: vs(o)) for i, stem in enumerate(STEMS)}
 RUNS.update({"stage": stage, "championship": lambda: championship(2), "2on2": lambda: championship(3),
              "battle": battle, "demo": lambda: mode(5, 1400)})
+RUNS.update({f"act{n}": (lambda n=n: act(n)) for n in range(1, 7)})
+# Named only: the whole campaign with seven computer allies, meant for a check
+# build whose enemies have 1 HP (BURNRATE_CHECK_STAGE_HP=1, docs/STORY.md).
+CHECK_RUNS = {"campaign": lambda: act(1, 40000, allies=7)}
 CAPTURES = [int(c) for c in os.environ.get("PLAYTEST_CAPTURES", "").split(",") if c]
 
 def run(name):
-    script, cycles = RUNS[name]()
+    script, cycles = {**RUNS, **CHECK_RUNS}[name]()
     out = B / "runs" / "playtest" / name; out.mkdir(parents=True, exist_ok=True)
     for f in out.glob("*"):
         if f.is_file(): f.unlink()
