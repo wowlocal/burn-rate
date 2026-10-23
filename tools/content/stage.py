@@ -1,0 +1,279 @@
+#!/usr/bin/env python3
+"""Stage Burn Rate's content for BurnRateContentBuilder.
+
+Writes STAGE_DIR/stage.json and every file it names: the DAT texts (plaintext;
+the builder encrypts them), sprite sheets made by tools/art/process.py from
+the raw Codex art, interface pictures, sounds, music and the initial record.
+Pictures still to be drawn are plain placeholders.
+
+Usage: stage.py STAGE_DIR   (raw art from $BURNRATE_RAW, default on NTSD-Builds)
+"""
+import json, math, os, shutil, struct, subprocess, sys
+from pathlib import Path
+import numpy as np
+from PIL import Image, ImageDraw
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools" / "art"))
+import process  # noqa: E402
+
+RAW = Path(os.environ.get("BURNRATE_RAW", "/Volumes/NTSD-Builds/tasks/burnrate/art/raw"))
+CHARACTERS = json.loads((ROOT / "art" / "characters.json").read_text())
+
+# --- names shared with Sources/BurnRateRules/BurnRateRules.swift ---------------
+def two(n): return f"{n:02d}"
+FRONT = [f"BR_FRONT_{two(i)}" for i in range(24)]
+IFACE = [f"BR_IFACE_{two(i)}" for i in range(10)]
+COMMON = [f"data\\br_common_{two(i)}.wav" for i in range(18)]
+MENU = [f"BR_MENU_{two(i)}" for i in range(11)]
+WAR = ["BR_WAR_00", "BR_WAR_01"]
+MENU_SOUNDS = [f"data\\br_menu_{i}.wav" for i in range(5)]
+MUSIC = [f"bgm\\{n}.wma" for n in ("main", "stage1", "stage2", "stage3", "stage4", "stage5", "boss1", "boss2")]
+SCREEN = (794, 550)
+
+# --- the initial record (0x44d000, 0xc3a8 bytes): zero but for these words ----
+RECORD_BASE, RECORD_SIZE = 0x44d000, 0xc3a8
+RECORD_WORDS = {
+    0x44d78c: SCREEN[0], 0x44d790: SCREEN[1],  # client size (window, back buffer)
+    0x44d068: 1,          # front menu bitmaps load while nonzero
+    0x44d05c: 1,          # the first loading runs only for exactly 1
+    0x44d020: 10,         # the mode screen after the first loading
+    0x44d07c: 1,          # loaded menu bitmaps load while nonzero
+    0x44dce8: 0x44a2b4,   # the replay writer's version pointer (exact)
+    0x44d03c: 0x100,      # the game's version word
+}
+
+# --- file writers -----------------------------------------------------------
+bmp_bytes = process.bmp_bytes
+
+def dib_bytes(rgb):
+    return bmp_bytes(rgb)[14:]
+
+def wav_bytes(samples, rate=22050):
+    data = bytes(int(max(0, min(255, 128 + s * 127))) for s in samples)
+    fmt = struct.pack("<HHIIHH", 1, 1, rate, rate, 1, 8)
+    body = b"WAVE" + b"fmt " + struct.pack("<I", len(fmt)) + fmt + b"data" + struct.pack("<I", len(data)) + data
+    if len(data) % 2: body += b"\0"
+    return b"RIFF" + struct.pack("<I", len(body)) + body
+
+def tone(seconds, freq0, freq1=None, noise=0.0, volume=0.6, rate=22050, seed=1):
+    rng = np.random.default_rng(seed); n = int(seconds * rate); out = []
+    freq1 = freq0 if freq1 is None else freq1; phase = 0.0
+    for i in range(n):
+        t = i / n; f = freq0 + (freq1 - freq0) * t; phase += 2 * math.pi * f / rate
+        env = (1 - t) ** 2 * min(1.0, i / 80)
+        out.append(volume * env * ((1 - noise) * math.sin(phase) + noise * (rng.random() * 2 - 1)))
+    return out
+
+def panel(w, h, fill, edge=(250, 250, 250), label=None):
+    img = Image.new("RGB", (w, h), fill); d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, w - 1, h - 1], outline=edge)
+    if label: d.text((4, 2), label, fill=edge)
+    a = np.asarray(img).copy(); a[a.sum(axis=-1) == 0] = (8, 8, 16); return a
+
+class Stage:
+    def __init__(self, root):
+        self.root = root
+        if root.exists(): shutil.rmtree(root)
+        root.mkdir(parents=True)
+        self.doc = {"exeLabel": "Burn Rate content (no reference EXE)", "absentFiles": ["data/ad0.txt"],
+                    "startup": [], "catalog": [], "commonSounds": [], "interfaceBitmaps": [], "menuBitmaps": [],
+                    "warBitmaps": [], "arenas": [], "music": {"sampleRate": 22050, "entries": []}}
+    def file(self, rel, data):
+        p = self.root / rel; p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(data if isinstance(data, (bytes, bytearray)) else data.encode("ascii")); return rel
+    def catalog(self, name, kind, rel, data, encrypt=False):
+        self.file(rel, data)
+        e = {"name": name, "kind": kind, "source": rel}
+        if encrypt: e["encrypt"] = True
+        self.doc["catalog"].append(e)
+    def write(self):
+        (self.root / "stage.json").write_text(json.dumps(self.doc, indent=1))
+
+# --- DAT text -----------------------------------------------------------------
+CX, CY = process.CENTER_X, process.BASELINE
+BODY = "bdy:\nkind: 0 x: 25 y: 14 w: 28 h: 63\nbdy_end:\n"
+LOW_BODY = "bdy:\nkind: 0 x: 22 y: 36 w: 34 h: 41\nbdy_end:\n"
+SWING = "data\\br_swing.wav"   # frame sound paths stay under 20 characters
+
+def itr(x, y, w, h, dvx, fall, injury, arest=8, bdefend=16, dvy=0):
+    return (f"itr:\nkind: 0 x: {x} y: {y} w: {w} h: {h} dvx: {dvx} dvy: {dvy} fall: {fall} arest: {arest} "
+            f"bdefend: {bdefend} injury: {injury}\nitr_end:\n")
+
+def frame(n, name, pic, state, wait, nxt, body=BODY, extra="", dvx=0, dvy=0):
+    return (f"<frame> {n} {name}\npic: {pic} state: {state} wait: {wait} next: {nxt} dvx: {dvx} dvy: {dvy} dvz: 0 "
+            f"centerx: {CX} centery: {CY}\n{extra}{body}<frame_end>\n\n")
+
+# Pictures (tools/art/process.py order): sheet A 0-11, sheet B 12-23, sheet C 24-31.
+P = dict(idle1=0, idle2=1, walk=[2, 3, 4, 5], run=[6, 7, 8], wind=9, punch=10, kick=11,
+         crouch=12, tuck=13, top=14, airkick=15, lunge=16, block=17, hitA=18, hitB=19, flung=20, lying=21,
+         rise=22, land=23, sp_wind=24, sp_release=25, uppercut=26, charge=27, backfist=28, victory=29, tired=30, taunt=31)
+
+def character_text(c, stem):
+    s = c.get("stats", {})
+    walk, run = s.get("walk", 4.0), s.get("run", 8.0)
+    power = s.get("power", 1.0)
+    t = (f"\n<bmp_begin>\nname: {c['name'].replace(' ', '_')}\nhead: sprite\\br\\{stem}_f.bmp\nsmall: sprite\\br\\{stem}_s.bmp\n"
+         f"file(0-39): sprite\\br\\{stem}_0.bmp  w: {process.CELL}  h: {process.CELL}  row: {process.COLUMNS}  col: {process.ROWS}\n"
+         f"walking_frame_rate 3\nwalking_speed {walk}\nwalking_speedz {walk / 2}\nrunning_frame_rate 3\n"
+         f"running_speed {run}\nrunning_speedz {run / 6}\nheavy_walking_speed 3.0\nheavy_walking_speedz 1.5\n"
+         f"heavy_running_speed 5.0\nheavy_running_speedz 0.75\njump_height {s.get('jump', -15.5)}\njump_distance 8.5\n"
+         f"jump_distancez 3.5\ndash_height -9.5\ndash_distance 15.0\ndash_distancez 3.5\n"
+         f"rowing_height -2.0\nrowing_distance 4.0\n<bmp_end>\n\n")
+    def dmg(v): return int(round(v * power))
+    t += frame(0, "standing", P["idle1"], 0, 8, 1) + frame(1, "standing", P["idle2"], 0, 8, 2)
+    t += frame(2, "standing", P["idle1"], 0, 8, 3) + frame(3, "standing", P["idle2"], 0, 8, 999)
+    for i in range(4): t += frame(5 + i, "walking", P["walk"][i], 1, 3, 999)
+    for i in range(3): t += frame(9 + i, "running", P["run"][i], 2, 2, 999)
+    # Standing attacks: 60 (jab) or 65 (kick), drawn at random by the engine.
+    t += frame(60, "punch", P["wind"], 3, 1, 61)
+    t += frame(61, "punch", P["punch"], 3, 2, 62, extra=f"sound: {SWING}\n" + itr(45, 26, 40, 16, 4, 20, dmg(28)))
+    t += frame(62, "punch", P["wind"], 3, 1, 999)
+    t += frame(65, "kick", P["idle1"], 3, 1, 66)
+    t += frame(66, "kick", P["kick"], 3, 3, 67, extra=f"sound: {SWING}\n" + itr(42, 8, 42, 24, 6, 35, dmg(34), arest=10))
+    t += frame(67, "kick", P["idle1"], 3, 2, 999)
+    # Jump attack, run attack, dash attack.
+    t += frame(80, "jump_attack", P["airkick"], 3, 2, 81, extra=f"sound: {SWING}\n" + itr(40, 30, 40, 30, 8, 70, dmg(40)))
+    t += frame(81, "jump_attack", P["airkick"], 3, 6, 999)
+    t += frame(85, "run_attack", P["charge"], 3, 3, 86, dvx=4, extra=f"sound: {SWING}\n" + itr(40, 16, 36, 50, 12, 70, dmg(45), arest=14))
+    t += frame(86, "run_attack", P["charge"], 3, 4, 999)
+    t += frame(90, "dash_attack", P["airkick"], 3, 2, 91, extra=f"sound: {SWING}\n" + itr(40, 30, 40, 30, 10, 70, dmg(45)))
+    t += frame(91, "dash_attack", P["airkick"], 3, 6, 999)
+    # Rowing (a recovery flip from a fall, or defend while running).
+    for n in (100, 108): t += frame(n, "rowing", P["tuck"], 6, 3, n + 1, body="") + frame(n + 1, "rowing", P["tuck"], 6, 3, 999, body="")
+    t += frame(102, "rolling", P["tuck"], 6, 3, 103, dvx=8, body=LOW_BODY) + frame(103, "rolling", P["crouch"], 6, 3, 999, body=LOW_BODY)
+    # Defence.
+    t += frame(110, "defend", P["block"], 7, 12, 999)
+    t += frame(111, "defend", P["block"], 7, 4, 110)
+    t += frame(112, "broken_defend", P["hitB"], 8, 8, 999)
+    # Falling (the physics chooses among them by vertical speed), lying, rising.
+    for n in range(180, 192): t += frame(n, "falling", P["flung"], 12, 2, 0)
+    t += frame(230, "lying", P["lying"], 14, 22, 232, body="") + frame(231, "lying", P["lying"], 14, 22, 232, body="")
+    t += frame(232, "getting_up", P["rise"], 14, 5, 999, body="")
+    # Injuries.
+    t += frame(220, "injured", P["hitA"], 11, 5, 999)
+    for n in (222, 224): t += frame(n, "injured", P["hitA"], 11, 2, n + 1) + frame(n + 1, "injured", P["hitB"], 11, 3, 999)
+    t += frame(226, "dazed", P["hitB"], 16, 3, 227) + frame(227, "dazed", P["tired"], 16, 6, 999)
+    # Jump, dash, landings.
+    t += frame(210, "jump", P["crouch"], 4, 1, 211, body=LOW_BODY) + frame(211, "jump", P["tuck"], 4, 1, 212)
+    t += frame(212, "jump", P["top"], 4, 1, 0)
+    t += frame(213, "dash", P["lunge"], 5, 1, 0) + frame(214, "dash", P["top"], 5, 1, 0)
+    t += frame(216, "dash", P["lunge"], 5, 1, 0) + frame(217, "dash", P["top"], 5, 1, 0)
+    t += frame(215, "crouch", P["land"], 15, 2, 999, body=LOW_BODY) + frame(219, "crouch", P["land"], 15, 2, 999, body=LOW_BODY)
+    t += frame(218, "stop_running", P["land"], 15, 3, 999, body=LOW_BODY)
+    return t
+
+ITEM_CELL = 31
+def item_text(name, stem):
+    t = (f"\n<bmp_begin>\nname: {name}\nfile(0-3): sprite\\br\\{stem}_0.bmp  w: {ITEM_CELL}  h: {ITEM_CELL}  row: 4  col: 1\n"
+         f"weapon_hp: 60\nweapon_drop_hurt: 7\n<bmp_end>\n\n")
+    def f(n, name, pic, state, nxt):
+        return (f"<frame> {n} {name}\npic: {pic} state: {state} wait: 1 next: {nxt} dvx: 0 dvy: 0 dvz: 0 "
+                f"centerx: {ITEM_CELL // 2} centery: {ITEM_CELL - 1}\n<frame_end>\n\n")
+    for i in range(4): t += f(i, "in_the_sky", i, 1000, 0 if i == 3 else i + 1)
+    return t + f(60, "on_ground", 0, 1004, 0) + f(70, "on_ground", 0, 1004, 0)
+
+BACKGROUND = "bg\\br\\demoday\\bg.dat"
+BG_SHADOW = "bg\\br\\demoday\\s.bmp"
+BG_LAYERS = ["bg\\br\\demoday\\sky.bmp", "bg\\br\\demoday\\floor.bmp"]
+def background_text():
+    return ("\nname: Demo_Day\nwidth: 1600\nzboundary: 330 480\nshadow: " + BG_SHADOW + " shadowsize: 18 5\n"
+            "layer: " + BG_LAYERS[0] + "\ntransparency: 0 width: 794 x: 0 y: 0 height: 330 loop: 794\nlayer_end\n"
+            "layer: " + BG_LAYERS[1] + "\ntransparency: 0 width: 794 x: 0 y: 300 height: 250 loop: 794\nlayer_end\n\n")
+
+def stage_text():
+    return "\n<stage> id: 0\n<phase> bound: 900\nid: 2 x: 700 hp: 150 times: 1\n<phase_end>\n<stage_end>\n\n"
+
+def control_text():
+    keys = [[0x26, 0x28, 0x25, 0x27, 0x41, 0x53, 0x44],          # P1: arrows, A attack, S jump, D defend
+            [0x54, 0x47, 0x46, 0x48, 0x5a, 0x58, 0x43],          # P2: T G F H, Z X C
+            [0x49, 0x4b, 0x4a, 0x4c, 0x55, 0x4f, 0x50],          # P3: I K J L, U O P
+            [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37]]          # P4: digits
+    lines = [" ".join(str(v) for v in [0] + k + [5, 6, 7]) for k in keys]
+    lines += ["Founder CoFounder Angel Seed", "0", "1", "Burn Rate settings", "made by tools/content/stage.py", "end of settings"]
+    return "\r\n".join(lines)
+
+def main():
+    root = Path(sys.argv[1]); st = Stage(root)
+    # Startup: record, MENU_BACK1..13, front bitmaps, data files, menu WAVs.
+    rec = bytearray(RECORD_SIZE)
+    for addr, value in RECORD_WORDS.items(): rec[addr - RECORD_BASE:addr - RECORD_BASE + 4] = struct.pack("<I", value)
+    st.doc["startup"].append({"path": "initial.bin", "source": st.file("startup/initial.bin", bytes(rec))})
+    for n in range(1, 14):
+        st.doc["startup"].append({"path": f"bitmaps/MENU_BACK{n}.dib", "source": st.file(f"startup/MENU_BACK{n}.dib",
+            dib_bytes(panel(*SCREEN, (20 + 6 * n, 24, 60 + 8 * n), label=f"BURN RATE {n}")))})
+    for i, name in enumerate(FRONT):
+        st.doc["startup"].append({"path": f"bitmaps/{name}.dib", "source": st.file(f"startup/{name}.dib",
+            dib_bytes(panel(256, 260 if 18 <= i <= 23 else 64, (40, 40 + 8 * i, 90), label=name)))})
+    st.doc["startup"].append({"path": "data/control.txt", "source": st.file("startup/control.txt", control_text())})
+    st.doc["startup"].append({"path": "data/adinfo.txt", "source": st.file("startup/adinfo.txt", "dont_update 0 5 <end>\r\n")})
+    for i, name in enumerate(MENU_SOUNDS):
+        st.doc["startup"].append({"path": name.replace("\\", "/"), "source": st.file(f"startup/menu_{i}.wav",
+            wav_bytes(tone(0.08, 880 + 110 * i, 660, volume=0.4)))})
+
+    # Catalog.
+    objects = ""
+    sprite_out = root / "catalog" / "sprite"
+    for stem, c in CHARACTERS.items():
+        has_art = (RAW / stem / f"{stem}_A.png").exists()
+        args = [str(RAW), stem, str(sprite_out)] + ([] if has_art else ["--source-stem", "blitz", "--tint", str(37 * c["id"])])
+        subprocess.run([sys.executable, str(ROOT / "tools" / "art" / "process.py")] + args, check=True)
+        dat = f"data\\br_{stem}.dat"
+        st.catalog(dat, "file", f"catalog/{stem}.txt", character_text(c, stem), encrypt=True)
+        for suffix in ("_0.bmp", "_0_mirror.bmp", "_f.bmp", "_s.bmp"):
+            st.doc["catalog"].append({"name": f"sprite\\br\\{stem}{suffix}", "kind": "bitmapFile", "source": f"catalog/sprite/{stem}{suffix}"})
+        objects += f"id: {c['id']} type: 0 file: {dat}\r\n"
+    # One item (the engine's random drop needs a candidate): a coffee cup.
+    cup = np.zeros((ITEM_CELL, ITEM_CELL * 4 + 3, 3), np.uint8)
+    cup_src = RAW / "items" / "cup.png"
+    if cup_src.exists():
+        img = Image.open(cup_src).convert("RGB"); a = np.asarray(img); fg = ~process.magenta(a)
+        ys, xs = np.nonzero(fg); box = (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1)
+        rgb, keep = process.render(a, fg, box, (ITEM_CELL - 9) / max(box[2] - box[0], box[3] - box[1]))
+        for i in range(4):
+            h, w = keep.shape; ox = i * (ITEM_CELL + 1) + (ITEM_CELL - w) // 2; oy = ITEM_CELL - 1 - h
+            region = cup[oy:oy + h, ox:ox + w]; region[keep] = rgb[keep]
+    else:
+        cup[8:30, 4:27] = (200, 180, 140)
+    st.catalog("data\\br_coffee.dat", "file", "catalog/coffee.txt", item_text("Cold_Brew", "coffee"), encrypt=True)
+    st.catalog("sprite\\br\\coffee_0.bmp", "bitmapFile", "catalog/sprite/coffee_0.bmp", bmp_bytes(cup))
+    st.catalog("sprite\\br\\coffee_0_mirror.bmp", "bitmapFile", "catalog/sprite/coffee_0_mirror.bmp", bmp_bytes(cup[:, ::-1].copy()))
+    objects += "id: 100 type: 1 file: data\\br_coffee.dat\r\n"
+    catalog_txt = f"<object>\r\n{objects}<object_end>\r\n\r\n<background>\r\nid: 0 file: {BACKGROUND}\r\n<background_end>\r\n"
+    st.catalog("data\\data.txt", "file", "catalog/data.txt", catalog_txt)
+    st.catalog("data\\stage.dat", "file", "catalog/stage.txt", stage_text(), encrypt=True)
+    st.catalog(BACKGROUND, "file", "catalog/bg.txt", background_text(), encrypt=True)
+    st.catalog(SWING, "file", "catalog/swing.wav", wav_bytes(tone(0.12, 900, 200, noise=0.7, volume=0.5)))
+    # Background pictures (placeholders until G3).
+    sky = np.zeros((330, 794, 3), np.uint8); sky[:] = np.linspace([40, 30, 90], [230, 120, 90], 330)[:, None, :].astype(np.uint8)
+    floor = np.zeros((250, 794, 3), np.uint8); floor[:] = (70, 70, 80); floor[::24, :] = (90, 90, 104)
+    shadow = np.zeros((10, 36, 3), np.uint8)
+    yy, xx = np.mgrid[0:10, 0:36]; shadow[((xx - 17.5) / 18) ** 2 + ((yy - 4.5) / 5) ** 2 <= 1] = (24, 24, 30)
+    for name, arr in [(BG_SHADOW, shadow)] + list(zip(BG_LAYERS, [sky, floor])):
+        rel = "arena/" + name.replace("\\", "/")
+        st.file(rel, bmp_bytes(arr)); st.doc["arenas"].append({"name": name, "source": rel})
+    st.doc["catalog"].append({"name": BG_SHADOW, "kind": "bitmapFile", "source": "arena/" + BG_SHADOW.replace("\\", "/")})
+    # Built-ins the registry requests before the catalog.
+    for i, name in enumerate(["shadow1", "back99_1", "back99_2", "back99_3"]):
+        st.catalog(name, "dib", f"catalog/{name}.dib", dib_bytes(shadow if i == 0 else panel(64, 32, (60, 80 + 30 * i, 60))))
+    for name in MUSIC:
+        st.catalog(name, "music", f"catalog/{name.split(chr(92))[1]}.txt", f"Burn Rate placeholder for {name}; never read\n")
+
+    # Common sounds, interface, menus, War menu.
+    for i, name in enumerate(COMMON):
+        st.doc["commonSounds"].append({"name": name, "source": st.file(f"common/{i}.wav",
+            wav_bytes(tone(0.1 + 0.01 * i, 200 + 40 * i, 80 + 20 * i, noise=0.5, volume=0.5, seed=i)))})
+    for key, names, size in (("interfaceBitmaps", IFACE, (160, 60)), ("menuBitmaps", MENU, (200, 120)), ("warBitmaps", WAR, (200, 120))):
+        for i, name in enumerate(names):
+            st.doc[key].append({"name": name, "source": st.file(f"{key}/{name}.dib", dib_bytes(panel(*size, (90, 30 + 15 * i, 60), label=name)))})
+
+    # Music: short quiet tracks until G5 (AVAudioPlayer plays WAV).
+    for i, name in enumerate(MUSIC):
+        stem = name.split("\\")[1][:-4]; samples = tone(1.0, 110 + 10 * i, volume=0.05)
+        st.doc["music"]["entries"].append({"name": name, "resource": f"{stem}.wav", "frames": len(samples),
+                                           "source": st.file(f"music/{stem}.wav", wav_bytes(samples))})
+    st.write()
+    print(f"staged {len(st.doc['catalog'])} catalog entries into {root}")
+
+if __name__ == "__main__":
+    main()
