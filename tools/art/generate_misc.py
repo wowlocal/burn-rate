@@ -8,7 +8,9 @@ Usage: generate_misc.py JOB [JOB...]   (generate_misc.py --list)
 import os, subprocess, sys, time
 from pathlib import Path
 
-RAW = Path(os.environ.get("BURNRATE_RAW", "/Volumes/NTSD-Builds/tasks/burnrate/art/raw")) / "misc"
+if "BURNRATE_RAW" not in os.environ:
+    sys.exit("set BURNRATE_RAW to a folder outside the repository for the full-size Codex outputs")
+RAW = Path(os.environ["BURNRATE_RAW"]) / "misc"
 STYLE = ("in the style of 1990s arcade beat-'em-up pixel art: crisp pixels, limited palette, dark navy outlines, "
          "no text, no letters, no logos, no watermark")
 STAGE = ("a side-view 2D fighting game stage background, wide landscape, {style}. The lower 45% of the image is a "

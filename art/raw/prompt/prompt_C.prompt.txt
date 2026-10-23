@@ -1,6 +1,6 @@
 Use case: stylized-concept
 Asset type: production sprite sheet C for a 2D side-scrolling fighting game.
-Reference image: /Volumes/NTSD-Builds/tasks/burnrate/art/raw/prompt/prompt_A.png is the authoritative character model and pixel-art style. Create ONE NEW image of the EXACT SAME fictional character, with eight NEW poses. Replace the source sheet's 4-by-3 pose layout with a 4-column by 2-row layout. Preserve identity, costume, colours, outline colour, sprite scale, anatomy and proportions precisely.
+Reference image: $BURNRATE_RAW/prompt/prompt_A.png is the authoritative character model and pixel-art style. Create ONE NEW image of the EXACT SAME fictional character, with eight NEW poses. Replace the source sheet's 4-by-3 pose layout with a 4-column by 2-row layout. Preserve identity, costume, colours, outline colour, sprite scale, anatomy and proportions precisely.
 
 Scene/backdrop: one flat opaque solid magenta #FF00FF everywhere outside sprites and the two requested hologram effects. No gradients, shadows, floor, scenery, text, labels, grid lines, panel borders, frames or watermark.
 

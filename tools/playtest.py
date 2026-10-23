@@ -2,16 +2,16 @@
 """Headless playtests: every founder in VS against the computer (with both
 specials), and every mode on the mode list. Reports each run's events and
 any engine boundary (a stop at an unsupported state).
-Usage: playtest.py [BUILD_DIR] [RUN ...]   (RUN: vs-<stem>, demo, stage,
-championship, 2on2, battle; default all)"""
+Usage: playtest.py [BUILD_DIR] [RUN ...]   (BUILD_DIR default build/; RUN:
+vs-<stem>, demo, stage, championship, 2on2, battle; default all)"""
 import json, os, subprocess, sys
 from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 B = Path(sys.argv[1]) if len(sys.argv) > 1 and not sys.argv[1].startswith(("vs-", "demo", "stage", "champ", "2on2", "battle")) else \
-    Path("/Volumes/NTSD-Builds/tasks/burnrate/build")
-ONLY = [a for a in sys.argv[1:] if not a.startswith("/")]
+    ROOT / "build"
+ONLY = [a for a in sys.argv[1:] if a.split("-")[0] in ("vs", "demo", "stage", "championship", "2on2", "battle")]
 STEMS = list(json.loads((ROOT / "art" / "characters.json").read_text()))
 ATTACK, JUMP, DEFEND, UP, DOWN, LEFT, RIGHT = 65, 83, 68, 38, 40, 37, 39
 

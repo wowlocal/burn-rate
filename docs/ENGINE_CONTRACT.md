@@ -3,7 +3,10 @@
 Read-only survey of engine/ at Randori 3dc22e4 (+ E9 b3efa7a). Path prefixes:
 C/ = engine/Sources/RandoriCore/, R/ = RandoriRuntime/, M/ = RandoriMacPlatform/,
 A/ = RandoriAppKitHost/, H/ = RandoriHeadlessHost/, S/ = engine/Tests/RandoriTests/Synthetic/,
-ev/ = ntsd docs/evidence/, N/ = ntsd native/.
+ev/ = ntsd docs/evidence/, N/ = ntsd native/ (ntsd = the NTSD port,
+https://github.com/wowlocal/ntsd-2.4, branch exp/engine-split, where Randori was split out).
+Since then Randori 786befd (E10) lets a game set its window title and credit strings
+(`OriginalGameRules.Branding`); the notes below that say the title is fixed predate it.
 
 Proven by the synthetic pack: loading, startup → title → START → mode screen, a VS
 match vs a computer to KO (body 299), result screen, back to character screen, replay

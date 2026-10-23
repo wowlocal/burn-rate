@@ -1,18 +1,20 @@
 #!/bin/zsh
-# Burn Rate's whole build, outputs on NTSD-Builds (never the internal disk):
-#  1. tools/content/stage.py stages the content (raw Codex art from $BURNRATE_RAW);
+# Burn Rate's whole build (outputs in BUILD_DIR, default build/ in the repository):
+#  1. tools/content/stage.py stages the content (art from $BURNRATE_RAW, default art/raw);
 #  2. BurnRateContentBuilder writes the eight engine packages and
 #     Sources/BurnRateContent/GeneratedIdentity.swift;
 #  3. swift build (release) of the app and the headless host;
 #  4. BurnRate.app: the executable, the packages in Contents/Resources,
 #     Info.plist, an ad-hoc signature.
-# Usage: tools/build.sh [BUILD_DIR]
+# Usage: tools/build.sh [BUILD_DIR]   (BURNRATE_PYTHON: a Python 3 with Pillow and NumPy,
+#   default python3; BURNRATE_TOOLCHAIN: a Swift 6.4 toolchain's bin, default Xcode's)
 set -eu
 REPO=${0:A:h:h}
-B=${1:-/Volumes/NTSD-Builds/tasks/burnrate/build}
-PY=${BURNRATE_PYTHON:-/Volumes/NTSD-Builds/tasks/burnrate/venv/bin/python}
-XB=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+B=${1:-$REPO/build}
+PY=${BURNRATE_PYTHON:-python3}
+XB=${BURNRATE_TOOLCHAIN:-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin}
 mkdir -p $B
+B=${B:A}
 cd $REPO
 $PY tools/content/stage.py $B/stage
 $XB/swift-build --scratch-path $B/swiftpm --build-system native -c release --product BurnRateContentBuilder > $B/builder-build.log 2>&1 \

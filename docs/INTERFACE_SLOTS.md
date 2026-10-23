@@ -1,7 +1,7 @@
 # Interface slots: what Burn Rate must draw (survey 2026-10-23)
 
-Read-only survey of the Randori engine (ntsd-2.4 worktree, engine at b3efa7a
-plus E10 work in progress) and NTSD's profile. `E/` = engine/Sources/RandoriCore,
+Read-only survey of the Randori engine (at b3efa7a plus E10 work in progress,
+as vendored in the NTSD port, https://github.com/wowlocal/ntsd-2.4) and NTSD's profile. `E/` = engine/Sources/RandoriCore,
 `R/` = engine/Sources/RandoriRuntime, `D/` = ntsd docs/research. Screen 794×550.
 Y = [453da4], Y′ = [45757c] (ad-info y line, normally 0); title-menu base
 B = Y+202, mode-list base M = Y+206. COLORREF = 0x00BBGGRR.

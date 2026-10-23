@@ -40,10 +40,16 @@ Needs macOS 14+, Swift 6.4 (Xcode with the 6.4 toolchain) and Python 3 with
 Pillow and NumPy. The engine is the `Vendor/randori` submodule:
 
 ```sh
-git submodule update --init
-tools/build.sh /path/to/build      # content, executables and BurnRate.app
-open /path/to/build/BurnRate.app
+git clone --recursive https://github.com/wowlocal/burn-rate.git
+cd burn-rate
+tools/build.sh                 # content, executables and BurnRate.app in build/
+open build/BurnRate.app
 ```
+
+`tools/build.sh BUILD_DIR` builds elsewhere; `BURNRATE_PYTHON` names the
+Python (default `python3`) and `BURNRATE_TOOLCHAIN` a Swift toolchain's
+`bin` (default Xcode's). `tools/smoke.sh` (a scripted match) and
+`tools/playtest.py` (every founder and every mode, headless) check a build.
 
 `tools/build.sh` stages the content (`tools/content/stage.py`: DATs, sprite
 sheets, interface, sounds, music), runs `BurnRateContentBuilder` (the
@@ -51,7 +57,8 @@ engine's eight content packages and `GeneratedIdentity.swift`), builds the
 app and the headless host, and assembles the app bundle. The raw art is in
 `art/raw` (half-size copies made by `tools/art/archive.py`);
 `tools/art/generate.py` and `generate_misc.py` make the full-size originals
-with Codex CLI, and `BURNRATE_RAW` points the build at them.
+with Codex CLI into `$BURNRATE_RAW`, and the same variable points the
+build at them.
 
 See [docs/PLAN.md](docs/PLAN.md) for the plan and its ledger,
 [docs/ENGINE_CONTRACT.md](docs/ENGINE_CONTRACT.md) for what a game gives the

@@ -3,9 +3,9 @@
 # (player 1 Blitz, the computer on Random), with a signature special early on
 # and player 1 punching every 40 cycles, run until 3000 loaded cycles.
 # Passes when the match launches, ends (an epilogue back to the menu) and its
-# replay is written. Usage: tools/smoke.sh [BUILD_DIR]
+# replay is written. Usage: tools/smoke.sh [BUILD_DIR]   (default build/)
 set -u
-B=${1:-/Volumes/NTSD-Builds/tasks/burnrate/build}
+B=${1:-${0:A:h:h}/build}
 R=$B/runs/smoke; rm -rf $R; mkdir -p $R/overlay
 A=65; RT=39; UP=38; D=68
 LS="4 hold $A 1; 10 hold $A 1; 14 hold $RT 1; 18 hold $A 1; 22 hold $A 1; 182 hold $A 1; 188 hold $RT 1; 192 hold $RT 1"

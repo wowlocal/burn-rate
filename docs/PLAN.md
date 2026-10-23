@@ -16,10 +16,11 @@ startup founders fight. ассеты будешь генерировать пр�
   dependency (the engine uses `unsafeFlags`, which version-pinned
   dependencies reject). Swift 6.4, macOS 14+, Swift 5 language mode.
 - **Storage**: sources here; builds, caches, generated content packages and
-  raw Codex outputs on `/Volumes/NTSD-Builds/tasks/burnrate` (never the
-  internal disk or X5). Curated source art (cropped, reduced) is committed.
+  the full-size Codex outputs (`$BURNRATE_RAW`) outside the repository's
+  history (`build/` is ignored). Half-size copies of the Codex art
+  (`art/raw`, with their prompts) are committed.
 - **Content pipeline**: Codex CLI (`codex exec -i REF … < prompt`) makes
-  magenta-backed sheets → `tools/art` (Python + Pillow, venv on NTSD-Builds)
+  magenta-backed sheets → `tools/art` (Python + Pillow + NumPy)
   slices, scales, despills and keys them to black → the Swift builder
   (`BurnRateContentBuilder`, after the engine tests' synthetic pack) writes
   the eight engine packages, their manifests and `GeneratedIdentity.swift`.
@@ -56,7 +57,7 @@ startup founders fight. ассеты будешь генерировать пр�
 | G3 | Stages (backgrounds, layers, shadow) and items | **done** (2026-10-23: four stages, the coffee item; the built-in road waits for E10's name) |
 | G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | **done** (2026-10-23; LF2's credit lines wait for E10) |
 | G5 | Sound effects and music | **done** (2026-10-23, synthesized) |
-| G6 | macOS app (.app on NTSD-Builds), window title, playtest | **done** (2026-10-23) |
+| G6 | macOS app (BurnRate.app), window title, playtest | **done** (2026-10-23) |
 
 ## Ledger
 

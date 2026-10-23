@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate character art with Codex CLI's image generation.
 
-Each call runs `codex exec` in the character's raw folder on NTSD-Builds and
+Each call runs `codex exec` in the character's folder under $BURNRATE_RAW and
 asks for one magenta-backed image. Sheet A is drawn from the description
 alone; sheets B, C and the portrait take sheet A as their visual reference,
 so the character stays the same. Raw outputs stay outside the repository.
@@ -13,7 +13,9 @@ import json, os, subprocess, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RAW = Path(os.environ.get("BURNRATE_RAW", "/Volumes/NTSD-Builds/tasks/burnrate/art/raw"))
+if "BURNRATE_RAW" not in os.environ:
+    sys.exit("set BURNRATE_RAW to a folder outside the repository for the full-size Codex outputs")
+RAW = Path(os.environ["BURNRATE_RAW"])
 CHARACTERS = json.loads((ROOT / "art" / "characters.json").read_text())
 
 STYLE = ("in the style of 1990s arcade beat-'em-up pixel art: crisp pixels, limited palette, dark navy "
