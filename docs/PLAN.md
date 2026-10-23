@@ -55,7 +55,7 @@ startup founders fight. ассеты будешь генерировать пр�
 | G2 | The roster to nine fighters, each with stats and one special (projectile objects) | **done** (2026-10-23: D>A projectile, D^A uppercut; balance open) |
 | G3 | Stages (backgrounds, layers, shadow) and items | **done** (2026-10-23: four stages, the coffee item; the built-in road waits for E10's name) |
 | G4 | Interface art: title backgrounds, front sheets, bitmap fonts, character screen, HUD, result and loading screens | **done** (2026-10-23; LF2's credit lines wait for E10) |
-| G5 | Sound effects and music | |
+| G5 | Sound effects and music | **done** (2026-10-23, synthesized) |
 | G6 | macOS app (.app on NTSD-Builds), window title, playtest | |
 
 ## Ledger
@@ -116,6 +116,17 @@ startup founders fight. ассеты будешь генерировать пр�
   War frames) for the rules. Checked in the AppKit app: title, mode list,
   character screen with a computer on Random, settings, a match on the
   road with the HUD.
+
+- 2026-10-23 G5: tools/content/audio.py synthesizes every sound (no
+  samples): the 18 common slots by their engine events (hit, block,
+  knockdown, landing, dash, effect hits, object strike, freeze, ice, fire,
+  armour block; valid blips for the six slots without a caller), the five
+  menu sounds (join, OK, cancel, fanfare, round over), the attack swing,
+  and eight chiptune loops for the engine's music names (kick/snare/hat,
+  triangle bass, arpeggio, a pulse lead from a seeded two-bar motif over a
+  minor progression; 128-176 BPM, 22-30 s, 16-bit 22.05 kHz WAV for
+  AVAudioPlayer). Checked: levels (music peak 0.78, RMS ~0.11; effects
+  peak ≤ 0.98), the AppKit app starts with the packaged tracks.
 
 ## Next task
 

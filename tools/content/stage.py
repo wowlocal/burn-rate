@@ -23,6 +23,7 @@ CHARACTERS = json.loads((ROOT / "art" / "characters.json").read_text())
 # --- names shared with Sources/BurnRateRules/BurnRateRules.swift ---------------
 def two(n): return f"{n:02d}"
 import interface  # noqa: E402  (tools/content)
+import audio  # noqa: E402
 FRONT, IFACE, MENU, WAR = interface.FRONT, interface.IFACE, interface.MENU, interface.WAR
 COMMON = [f"data\\br_common_{two(i)}.wav" for i in range(18)]
 MENU_SOUNDS = [f"data\\br_menu_{i}.wav" for i in range(5)]
@@ -264,9 +265,8 @@ def main():
         st.doc["startup"].append({"path": f"bitmaps/{name}.dib", "source": st.file(f"startup/{name}.dib", dib_bytes(ui[name]))})
     st.doc["startup"].append({"path": "data/control.txt", "source": st.file("startup/control.txt", control_text())})
     st.doc["startup"].append({"path": "data/adinfo.txt", "source": st.file("startup/adinfo.txt", "dont_update 0 5 <end>\r\n")})
-    for i, name in enumerate(MENU_SOUNDS):
-        st.doc["startup"].append({"path": name.replace("\\", "/"), "source": st.file(f"startup/menu_{i}.wav",
-            wav_bytes(tone(0.08, 880 + 110 * i, 660, volume=0.4)))})
+    for i, (name, data) in enumerate(zip(MENU_SOUNDS, audio.menu_sounds())):
+        st.doc["startup"].append({"path": name.replace("\\", "/"), "source": st.file(f"startup/menu_{i}.wav", data)})
 
     # Catalog.
     objects = ""
@@ -318,7 +318,7 @@ def main():
     catalog_txt = f"<object>\r\n{objects}<object_end>\r\n\r\n<background>\r\n{backgrounds}<background_end>\r\n"
     st.catalog("data\\data.txt", "file", "catalog/data.txt", catalog_txt)
     st.catalog("data\\stage.dat", "file", "catalog/stage.txt", stage_text(), encrypt=True)
-    st.catalog(SWING, "file", "catalog/swing.wav", wav_bytes(tone(0.12, 900, 200, noise=0.7, volume=0.5)))
+    st.catalog(SWING, "file", "catalog/swing.wav", audio.swing())
     shadow = np.zeros((10, 36, 3), np.uint8)
     yy, xx = np.mgrid[0:10, 0:36]; shadow[((xx - 17.5) / 18) ** 2 + ((yy - 4.5) / 5) ** 2 <= 1] = (24, 24, 30)
     for _, name, folder, raw in STAGES:
@@ -337,18 +337,17 @@ def main():
         st.catalog(name, "music", f"catalog/{name.split(chr(92))[1]}.txt", f"Burn Rate placeholder for {name}; never read\n")
 
     # Common sounds, interface, menus, War menu.
-    for i, name in enumerate(COMMON):
-        st.doc["commonSounds"].append({"name": name, "source": st.file(f"common/{i}.wav",
-            wav_bytes(tone(0.1 + 0.01 * i, 200 + 40 * i, 80 + 20 * i, noise=0.5, volume=0.5, seed=i)))})
+    for i, (name, data) in enumerate(zip(COMMON, audio.common_sounds())):
+        st.doc["commonSounds"].append({"name": name, "source": st.file(f"common/{i}.wav", data)})
     for key, names in (("interfaceBitmaps", IFACE), ("menuBitmaps", MENU), ("warBitmaps", WAR)):
         for name in names:
             st.doc[key].append({"name": name, "source": st.file(f"{key}/{name}.dib", dib_bytes(ui[name]))})
 
-    # Music: short quiet tracks until G5 (AVAudioPlayer plays WAV).
-    for i, name in enumerate(MUSIC):
-        stem = name.split("\\")[1][:-4]; samples = tone(1.0, 110 + 10 * i, volume=0.05)
-        st.doc["music"]["entries"].append({"name": name, "resource": f"{stem}.wav", "frames": len(samples),
-                                           "source": st.file(f"music/{stem}.wav", wav_bytes(samples))})
+    # Music: synthesized chiptune loops (AVAudioPlayer plays WAV on the Mac).
+    st.doc["music"]["sampleRate"] = audio.RATE
+    for name, (stem, data, frames) in zip(MUSIC, audio.music()):
+        st.doc["music"]["entries"].append({"name": name, "resource": f"{stem}.wav", "frames": frames,
+                                           "source": st.file(f"music/{stem}.wav", data)})
     st.write()
     print(f"staged {len(st.doc['catalog'])} catalog entries into {root}")
 
